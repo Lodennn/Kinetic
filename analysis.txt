@@ -1,0 +1,49 @@
+Database Design
+
+Tables:
+	Users
+		id - string
+		name - string
+		password - string
+		email - string
+
+	Programs
+		id - string
+		programName - string
+		programOptions - array
+		createdAt - date
+		
+	UsersPrograms
+		id - string
+		userId - string
+		programId - string
+		
+	Days
+		id - string
+		programId - string
+		dayName - string
+		createdAt - date
+		
+	Workouts
+		id - string
+		userId - string
+		dayId - string
+		programId - string
+		workoutName - string
+		category - string - dah haykon msln 'chest' 3lshan a2dar a3mlohom categories
+		numOfSets - number
+		reps - array
+		weights - array
+		totalNumOfWeights - number
+		totalNumOfReps - number
+		hasSuperSets - boolean
+		hasDropSets - boolean
+		progressState - enum - dah haykon 0 1 2 lw 0 yeb2a warning - 1 yeb2a byzed - 2 yeb2a bynzel
+		superSets - array of objects -> object = {workoutName, numOfSets, reps, weights, totalNumOfWeights, totalNumOfReps}
+		dropSets - array of objects -> object = {workoutName, numOfSets, reps, weights, totalNumOfWeights, totalNumOfReps}
+		createdAt - date - ###
+	
+	WorkoutsNames
+		id - string
+		userId - string
+		workoutName - string
