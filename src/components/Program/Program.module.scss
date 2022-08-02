@@ -1,0 +1,75 @@
+.program {
+  font-size: 3rem;
+  position: relative;
+  //   height: 40rem;
+
+  &:first-child {
+    margin-top: 8rem;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 13rem;
+  }
+
+  &--wrapper {
+    position: relative;
+    height: 40rem;
+    border-radius: 4rem;
+  }
+
+  &__floating-img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60rem;
+    top: -6vw;
+    & img {
+      position: relative;
+    }
+    &--1 {
+    }
+    &--2 {
+    }
+    &--3 {
+      img {
+        top: -3rem;
+      }
+    }
+    &--4 {
+      width: 40rem;
+      top: unset;
+      bottom: -0.7rem;
+    }
+    &--5 {
+      width: 45rem;
+      top: unset;
+      bottom: -0.7rem;
+    }
+  }
+
+  &__textcontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    margin-left: 4rem;
+  }
+  &__name {
+    color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    font-size: 12rem;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    span {
+      line-height: 0.8;
+    }
+  }
+  &__sub-title {
+    color: var(--color-white);
+    font-weight: 100;
+    letter-spacing: 3rem;
+    margin-left: 0.7rem;
+    text-transform: uppercase;
+  }
+}

@@ -1,0 +1,24 @@
+.badge {
+  width: 1.4rem;
+  height: 1.4rem;
+  &--up {
+    path {
+      fill: green;
+    }
+  }
+  &--down {
+    path {
+      fill: red;
+    }
+  }
+  &--super {
+    path {
+      fill: orangered;
+    }
+  }
+  &--drop {
+    path {
+      fill: cyan;
+    }
+  }
+}

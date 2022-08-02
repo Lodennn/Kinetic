@@ -1,0 +1,41 @@
+.navigation {
+  background-color: var(--color-primary);
+  font-size: 1.5rem;
+  a {
+    color: var(--color-white);
+  }
+  &__wrapper {
+    height: 6rem;
+  }
+  &__links {
+    display: flex;
+  }
+  &__item {
+    &:not(:first-child) {
+      padding-left: 4rem;
+    }
+  }
+
+  &__auth {
+    display: flex;
+    &-item {
+      display: flex;
+      align-items: center;
+      height: 4rem;
+      &:last-child {
+        margin-left: 6rem;
+        position: relative;
+        &::before {
+          content: "";
+          position: absolute;
+          left: -3rem;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 1px;
+          height: 90%;
+          background-color: var(--color-white);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+.workout {
+  background-color: var(--color-gray);
+  padding: 2rem 4rem;
+  border-radius: 2rem;
+  position: relative;
+  margin-bottom: 3rem;
+
+  & > * {
+    margin-bottom: 2.5rem;
+  }
+
+  &__header {
+    &-badges {
+      display: flex;
+    }
+    &-badge {
+      &:not(:last-child) {
+        padding-right: 2rem;
+      }
+    }
+  }
+  &__body {
+    h4 {
+      font-size: 5rem;
+      text-transform: uppercase;
+    }
+  }
+  &__footer {
+    display: flex;
+  }
+
+  &__info {
+    font-size: 2rem;
+    &:not(:last-child) {
+      margin-right: 3rem;
+    }
+    span {
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+  }
+
+  &__actions {
+    position: absolute;
+    top: 0;
+    right: 5rem;
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    svg {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+    &--edit,
+    &--delete {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    &--edit {
+    }
+    &--delete {
+      justify-content: flex-end;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        background: #ccc;
+        width: 1px;
+        height: 60%;
+        transform: translateY(-50%);
+      }
+    }
+  }
+}
