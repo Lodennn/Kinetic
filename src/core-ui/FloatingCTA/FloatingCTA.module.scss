@@ -1,0 +1,20 @@
+.floating-cta {
+  position: fixed;
+  bottom: 5rem;
+  right: 5rem;
+  width: 9rem;
+  height: 9rem;
+  background: var(--color-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  svg {
+    width: 3rem;
+    height: 3rem;
+    path {
+      fill: var(--color-white);
+    }
+  }
+}

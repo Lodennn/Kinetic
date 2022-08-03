@@ -12,17 +12,19 @@ import { BsChevronLeft } from "react-icons/bs";
 
 import "./AddWorkout.scss";
 import useReadData from "../../hooks/useReadData";
+import SupersetForm from "../SupersetForm/SupersetForm";
+import DropsetForm from "../DropsetForm/DropsetForm";
+import AddSpecialSetModal from "../../core-ui/Modal/AddSpecialSetModal/AddSpecialSetModal";
 
 const AddWorkout = (props) => {
   const [targetedMuscle, setTargetedMuscle] = useState("");
   const [activeSetsName, setActiveSetsName] = useState("");
+
   const [numOfSets, setNumOfSets] = useState([]);
   const [superSetNumOfSets, setSuperSetNumOfSets] = useState([]);
   const [dropSetNumOfSets, setDropSetNumOfSets] = useState([]);
-  const [numOfSpecialSets, setNumOfSpecialSets] = useState(0);
-  const [userSetsType, setUserSetsType] = useState("");
 
-  const [totalRepsOfDropset, setTotalRepsOfDropset] = useState(0);
+  const [userSetsType, setUserSetsType] = useState("");
 
   const userNumberOfWeight = useRef("");
   const userNumberOfReps = useRef("");
@@ -35,25 +37,12 @@ const AddWorkout = (props) => {
       );
   }, [activeSetsName, numOfSets]);
 
-  useEffect(() => {
-    setTotalRepsOfDropset(
-      dropSetNumOfSets.reduce((acc, cur) => {
-        return acc + cur.reps;
-      }, 0)
-    );
-  }, [dropSetNumOfSets]);
-
-  const {
-    data: setId,
-    showModal,
-    showModalHandler,
-    hideModalHandler,
-  } = useReadData();
-
+  // MAIN
   const addTargetedMuscle = useCallback((muscle) => {
     setTargetedMuscle(muscle);
   }, []);
 
+  // MAIN
   const onChangeNumberOfSets = useCallback((event) => {
     setNumOfSets(Array(+event.target.value).fill({ weight: "", reps: "" }));
     setSuperSetNumOfSets(
@@ -61,33 +50,49 @@ const AddWorkout = (props) => {
     );
   }, []);
 
+  // MAIN
   const onChangeNumberOfDropSets = useCallback((event) => {
     setDropSetNumOfSets(
       Array(+event.target.value).fill({ weight: "", reps: "" })
     );
   }, []);
 
-  const onChangeNumberOfSpecialSets = (event) => {
-    setNumOfSpecialSets(event.target.value);
-  };
-
+  // MAIN
   const getActiveSetsTypeHandler = (type) => {
     let setsName = type === "super" ? "Superset" : "Dropset";
     setActiveSetsName(setsName);
   };
 
+  // MAIN
   const toggleAnimationHandler = () => {
     setActiveSetsName("");
   };
 
+  // MAIN
+  const showModalForMainSets = (setId) => {
+    setUserSetsType("main");
+    showModalHandler(setId);
+  };
+
+  // SECONDARY MODAL
+  const {
+    data: setId,
+    showModal,
+    showModalHandler,
+    hideModalHandler,
+  } = useReadData();
+
+  // SECONDARY MODAL
   const onChangeUserNumberOfReps = (event) => {
     userNumberOfReps.current = event.target.value;
   };
 
+  // SECONDARY MODAL
   const onChangeUserNumberOfWeight = (event) => {
     userNumberOfWeight.current = event.target.value;
   };
 
+  // SECONDARY MODAL
   const addSetsHandler = () => {
     if (userSetsType === "main") {
       setNumOfSets((prevState) => {
@@ -118,16 +123,13 @@ const AddWorkout = (props) => {
     }
   };
 
-  const showModalForMainSets = (setId) => {
-    setUserSetsType("main");
-    showModalHandler(setId);
-  };
-
+  // SET TYPE PART
   const showModalForSuperSets = (setId) => {
     setUserSetsType("super");
     showModalHandler(setId);
   };
 
+  // SET TYPE PART
   const showModalForDropSets = (setId) => {
     setUserSetsType("drop");
     showModalHandler(setId);
@@ -137,26 +139,12 @@ const AddWorkout = (props) => {
     <Fragment>
       {showModal && (
         <ModalSecondary onHide={hideModalHandler}>
-          <div>
-            <input
-              type="text"
-              placeholder="Weight"
-              onChange={onChangeUserNumberOfWeight}
-            />
-            <input
-              type="text"
-              placeholder="Reps"
-              onChange={onChangeUserNumberOfReps}
-            />
-            <button
-              onClick={() => {
-                addSetsHandler();
-                hideModalHandler();
-              }}
-            >
-              +
-            </button>
-          </div>
+          <AddSpecialSetModal
+            onChangeUserNumberOfWeight={onChangeUserNumberOfWeight}
+            onChangeUserNumberOfReps={onChangeUserNumberOfReps}
+            hideModalHandler={hideModalHandler}
+            addSetsHandler={addSetsHandler}
+          />
         </ModalSecondary>
       )}
       <div className={"add-workout"}>
@@ -219,6 +207,7 @@ const AddWorkout = (props) => {
             );
           })}
 
+          {/* SPECIAL SET TYPE */}
           <div className="set-type">
             <header className="set-type__header">
               <div className="set-type__header-title">
@@ -243,70 +232,22 @@ const AddWorkout = (props) => {
                 ))}
               </div>
             </header>
+            {/* SPECIAL SET FORM */}
             <section>
               <div className="set-type__form">
                 {activeSetsName === "Superset" ? (
-                  <div className="set-type__form--super">
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        className="form-control kinetic-input kinetic-input--white"
-                        placeholder="Workout Name"
-                        onChange={onChangeNumberOfDropSets}
-                      />
-                    </div>
-                    <div className={`form-group-flex`}>
-                      <h4 className="title-4">Num of sets: </h4>
-                      <div>{numOfSets.length}</div>
-                    </div>
-                    <div style={{ display: "flex", gap: "3rem" }}>
-                      {superSetNumOfSets.map((set, idx) => {
-                        return (
-                          <AddSet
-                            id={idx}
-                            key={idx}
-                            reps={set.reps}
-                            weight={set.weight}
-                            showModalHandler={showModalForSuperSets.bind(
-                              null,
-                              idx
-                            )}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
+                  <SupersetForm
+                    onChangeNumberOfDropSets={onChangeNumberOfDropSets}
+                    numOfSets={numOfSets}
+                    superSetNumOfSets={superSetNumOfSets}
+                    showModalForSuperSets={showModalForSuperSets}
+                  />
                 ) : (
-                  <div className="set-type__form--drop">
-                    <div className={`form-group-flex`}>
-                      <h4 className="title-4">Num of sets: </h4>
-                      <input
-                        type="number"
-                        className="input-1-digit kinetic-input "
-                        defaultValue={0}
-                        onChange={onChangeNumberOfDropSets}
-                      />
-                    </div>
-                    <div style={{ display: "flex", gap: "3rem" }}>
-                      {dropSetNumOfSets.map((set, idx) => {
-                        return (
-                          <AddSet
-                            id={idx}
-                            key={idx}
-                            reps={set.reps}
-                            weight={set.weight}
-                            showModalHandler={showModalForDropSets.bind(
-                              null,
-                              idx
-                            )}
-                          />
-                        );
-                      })}
-                    </div>
-                    <div className="set-type__total-num-reps">
-                      Total of REPS: {totalRepsOfDropset}
-                    </div>
-                  </div>
+                  <DropsetForm
+                    onChangeNumberOfDropSets={onChangeNumberOfDropSets}
+                    dropSetNumOfSets={dropSetNumOfSets}
+                    showModalForDropSets={showModalForDropSets}
+                  />
                 )}
               </div>
             </section>

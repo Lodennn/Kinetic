@@ -12,7 +12,9 @@ const AddSet = (props) => {
       <Fragment>
         <div className={classes["sets__set"]}>
           <span>{props.reps}</span>
-          <div className={classes["sets__weight"]}>{props.weight + "kg"}</div>
+          {props.weight && (
+            <div className={classes["sets__weight"]}>{props.weight + "kg"}</div>
+          )}
         </div>
       </Fragment>
     </div>
