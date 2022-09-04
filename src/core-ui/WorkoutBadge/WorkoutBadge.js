@@ -27,7 +27,9 @@ const WorkoutBadge = (props) => {
 
   return (
     <RenderedBadge
-      className={`${classes.badge} ${classes[`badge--${props.type}`]}`}
+      className={`${classes.badge} ${classes[`badge--${props.type}`]} ${
+        classes[`badge--${props.size}`]
+      } ${classes[`badge--${props.color}`]}`}
     />
   );
 };

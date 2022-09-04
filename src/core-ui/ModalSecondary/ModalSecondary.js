@@ -8,7 +8,13 @@ const ModalSecondary = (props) => {
     return <div className={classes.backdrop} onClick={props.onHide}></div>;
   };
   const Modal = (props) => {
-    return <div className={classes.modal}>{props.children}</div>;
+    return (
+      <div
+        className={`${classes.modal} ${classes[`modal--${props.modalToUse}`]}`}
+      >
+        {props.children}
+      </div>
+    );
   };
 
   return (
@@ -18,7 +24,7 @@ const ModalSecondary = (props) => {
         document.getElementById("backdrop-overlay-secondary")
       )}
       {ReactDOM.createPortal(
-        <Modal>{props.children}</Modal>,
+        <Modal modalToUse={props.modalToUse}>{props.children}</Modal>,
         document.getElementById("modal-overlay-secondary")
       )}
     </Fragment>

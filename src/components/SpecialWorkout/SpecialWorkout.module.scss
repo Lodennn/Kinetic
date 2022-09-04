@@ -1,0 +1,30 @@
+.special-workout {
+  background: var(--color-primary);
+  padding: 0.8rem;
+  border-radius: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+
+  & > div:first-of-type {
+    padding-top: 8rem;
+    margin-bottom: 1rem;
+  }
+  & > div:last-of-type {
+    margin-bottom: 0rem;
+  }
+
+  &__set-wrapper {
+    position: absolute;
+    z-index: 1;
+    background: var(--color-primary);
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    width: 5rem;
+    height: 6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 5rem;
+    top: 0;
+  }
+}

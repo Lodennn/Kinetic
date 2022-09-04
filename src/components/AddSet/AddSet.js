@@ -1,19 +1,36 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useRef } from "react";
 import classes from "./AddSet.module.scss";
 
 const AddSet = (props) => {
+  const { showModalHandler, reps, id, weight, weightUnit, modifier, onChange } =
+    props;
+
+  const randomSetCheckboxId = useRef(Math.floor(Math.random() * (100000 + id)));
+
   return (
     <div
-      className={`${classes.sets} ${classes[`sets--${props.modifier}`]}`}
+      className={`${classes.sets} ${classes[`sets--${modifier}`]}`}
       onClick={() => {
-        props.showModalHandler(props.id);
+        showModalHandler &&
+          showModalHandler({
+            setId: id,
+            setCheckboxId: `set-checkbox-${randomSetCheckboxId.current}`,
+          });
       }}
     >
       <Fragment>
         <div className={classes["sets__set"]}>
-          <span>{props.reps}</span>
-          {props.weight && (
-            <div className={classes["sets__weight"]}>{props.weight + "kg"}</div>
+          <input
+            type="checkbox"
+            id={`set-${randomSetCheckboxId.current}`}
+            name={`set-checkbox-${randomSetCheckboxId.current}`}
+            value={`set-checkbox`}
+            className="checkbox__sets"
+            onChange={onChange && onChange}
+          />
+          <span>{reps}</span>
+          {weight && (
+            <div className={classes["sets__weight"]}>{weight + weightUnit}</div>
           )}
         </div>
       </Fragment>

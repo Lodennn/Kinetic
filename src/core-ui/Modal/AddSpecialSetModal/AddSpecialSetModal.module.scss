@@ -1,0 +1,47 @@
+.wrapper {
+  padding: 2rem;
+}
+
+.weight-transformer {
+  display: flex;
+  font-size: 2rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  position: absolute;
+  top: 3rem;
+  right: 3rem;
+  border: 1px solid #1c2bde00;
+  overflow: hidden;
+  &__item {
+    background: var(--color-gray);
+    padding: 0.5rem 1.3rem;
+    color: #ccc;
+    cursor: pointer;
+    &--active {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+    }
+  }
+}
+
+.special-set-modal {
+  overflow: hidden;
+  border-radius: 1rem;
+  margin-top: 4rem;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: var(--color-primary);
+    width: 100%;
+    height: 0.7rem;
+  }
+
+  &__confirm {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+  }
+}

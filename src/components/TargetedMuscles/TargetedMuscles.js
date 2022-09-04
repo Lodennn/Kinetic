@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import classes from "./TargetedMuscles.module.scss";
+import targetedMuscleClasses from "./TargetedMuscle/TargetedMuscle.module.scss";
+import TargetedMuscle from "./TargetedMuscle/TargetedMuscle";
 
 const TargetedMuscles = (props) => {
   const [activeMuscle, setActiveMuscle] = useState("");
@@ -7,24 +9,27 @@ const TargetedMuscles = (props) => {
   const { addTargetedMuscle } = props;
 
   useEffect(() => {
-    addTargetedMuscle(activeMuscle);
+    if (addTargetedMuscle) {
+      addTargetedMuscle(activeMuscle);
+    }
   }, [activeMuscle, addTargetedMuscle]);
 
   return (
     <div className={classes["targeted-muscles"]}>
       {props.muscles.map((muscle, idx) => {
         let activeMuscleClass =
-          muscle === activeMuscle
-            ? classes["targeted-muscles__muscle--active"]
+          muscle === activeMuscle || props.muscles.length === 1
+            ? targetedMuscleClasses["targeted-muscle--active"]
             : null;
+
         return (
-          <div
+          <TargetedMuscle
             key={muscle + idx}
-            className={`${classes["targeted-muscles__muscle"]} ${activeMuscleClass}`}
+            muscle={muscle}
             onClick={() => setActiveMuscle(muscle)}
-          >
-            <span>{muscle}</span>
-          </div>
+            activeClassName={activeMuscleClass}
+            onChange={props.onChange}
+          />
         );
       })}
     </div>

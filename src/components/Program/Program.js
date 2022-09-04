@@ -3,13 +3,13 @@ import classes from "./Program.module.scss";
 
 const Program = (props) => {
   return (
-    <Link to={`/program/${props.idx}`}>
+    <Link to={`/program/${props.id}`}>
       <div className={classes.program}>
         <div
           className={classes["program--wrapper"]}
-          style={{ backgroundImage: `url(${props.programImageBG})` }}
+          // style={{ backgroundImage: `url(${props.programImage})` }}
         >
-          <div
+          {/* <div
             className={`${classes["program__floating-img"]} ${
               classes[`program__floating-img--${props.idx}`]
             }`}
@@ -19,7 +19,7 @@ const Program = (props) => {
               alt="Program Img"
               className={`${classes["program__img"]} img-fluid`}
             />
-          </div>
+          </div> */}
           <div className={classes["program__textcontainer"]}>
             <h4 className={classes["program__name"]}>
               {props.programName.split(" ").map((text) => (

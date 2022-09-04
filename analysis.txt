@@ -32,6 +32,7 @@ Tables:
 		workoutName - string
 		category - string - dah haykon msln 'chest' 3lshan a2dar a3mlohom categories
 		numOfSets - number
+		sets - array - this will be mix between reps and weights [{reps: 10, weight: 20}, {reps: 12, weight: 18}, etc...]
 		reps - array
 		weights - array
 		totalNumOfWeights - number
@@ -39,8 +40,8 @@ Tables:
 		hasSuperSets - boolean
 		hasDropSets - boolean
 		progressState - enum - dah haykon 0 1 2 lw 0 yeb2a warning - 1 yeb2a byzed - 2 yeb2a bynzel
-		superSets - array of objects -> object = {workoutName, numOfSets, reps, weights, totalNumOfWeights, totalNumOfReps}
-		dropSets - array of objects -> object = {workoutName, numOfSets, reps, weights, totalNumOfWeights, totalNumOfReps}
+		superSets - array of objects -> object = {workoutName, numOfSets, sets: [{}, {}, {}], totalNumOfWeights, totalNumOfReps}
+		dropSets - array of objects -> object = {numOfSets, reps, weights, totalNumOfWeights, totalNumOfReps}
 		createdAt - date - ###
 	
 	WorkoutsNames

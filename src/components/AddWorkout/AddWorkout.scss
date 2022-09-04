@@ -1,17 +1,24 @@
 .add-workout {
-  min-height: 50rem;
+  // min-height: 50rem;
   overflow: hidden;
+  height: 60rem;
+  overflow-y: auto;
+
+  &__form {
+    height: 100%;
+  }
 
   &__actions {
     position: relative;
     display: flex;
+    justify-content: space-between;
     gap: 3rem;
     padding: 3rem 2rem;
     height: 10rem;
     transition: height 1s ease;
 
     &.sets-animation-active {
-      height: 30rem;
+      height: 100%;
     }
   }
 }
@@ -24,11 +31,30 @@
   width: 100%;
   height: 0px;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-white);
   opacity: 0;
   z-index: 99999;
-  transition: opacity, height 1s ease;
+  transition: opacity, height 0.5s ease;
   overflow: auto;
+
+  &--wrapper {
+    height: calc(100% - 74px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .flex-cta-wrapper {
+      padding: 2rem !important;
+    }
+  }
+
+  &__form {
+    height: 100%;
+  }
+
+  &--details {
+    overflow: initial;
+  }
+
   &__header {
     padding: 2rem;
     display: flex;
@@ -39,7 +65,7 @@
     top: 0;
     width: 100%;
     z-index: 9;
-    
+
     &-title {
       display: flex;
       align-items: center;
@@ -84,8 +110,22 @@
     }
   }
   &__form {
-    padding: 2rem;
-    height: 40rem;
+    &--wrapper {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    &--drop,
+    &--super {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
   }
   &__total-num-reps {
     font-size: 3rem;
@@ -96,14 +136,4 @@
 .add-workout__actions.sets-animation-active .set-type {
   opacity: 1;
   height: 100%;
-}
-
-@keyframes moveTo {
-  0% {
-    top: 0;
-  }
-  100% {
-    top: 2rem;
-    left: 2rem;
-  }
 }

@@ -1,0 +1,23 @@
+.work-details {
+  position: relative;
+
+  &__add-note {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+}
+
+.modal--read {
+  .set-type__form {
+    background-color: var(--color-primary);
+  }
+}
