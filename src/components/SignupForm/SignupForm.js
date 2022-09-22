@@ -16,7 +16,7 @@ const SignupForm = (props) => {
   } = useFormik({
     initialValues: {
       username: "",
-      email: 0,
+      email: "",
       age: 0,
       password: "",
       repassword: "",

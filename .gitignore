@@ -5,12 +5,15 @@
 /.pnp
 .pnp.js
 /UI_Design
+/src/config
 
 # testing
 /coverage
 
 # production
 /build
+/UI_Design
+/UI_DESIGN_PAGES
 
 # misc
 .DS_Store

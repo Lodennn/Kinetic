@@ -1,12 +1,23 @@
 import { useFormik } from "formik";
 import React, { Fragment, useState } from "react";
 import { useEffect } from "react";
+import PrimaryButton from "../../Buttons/PrimaryButton/PrimaryButton";
+import SecondaryButton from "../../Buttons/SecondaryButton/SecondaryButton";
 import classes from "./AddSpecialSetModal.module.scss";
+import * as Yup from "yup";
+import serviceError from "../../../services/errors";
+import { renderErrorClass, renderErrorMessage } from "../../../helpers/form";
 
 const AddSpecialSetModal = (props) => {
+  let timer;
   const [activeWeight, setActiveWeight] = useState("kg");
 
   const { getWeightUnit, setCheckboxId } = props;
+
+  const validationSchema = Yup.object().shape({
+    weight: Yup.number().positive().min(1).required(serviceError.positive),
+    reps: Yup.number().positive().min(1).required(serviceError.positive),
+  });
 
   const {
     values,
@@ -22,15 +33,21 @@ const AddSpecialSetModal = (props) => {
       reps: 0,
     },
     onSubmit(values) {
-      console.log("AddSpecialSetModal = values: ", values);
       if (values.reps && values.weight) {
         console.log("VALID");
+        timer = setTimeout(() => {
+          props.hideModalHandler();
+          props.addSetsHandler();
+        });
       } else {
         console.log("NOT VALID");
       }
-      // alert("values: ", JSON.stringify(values));
     },
+    validationSchema,
   });
+
+  console.log("errors: ", errors);
+  console.log("setCheckboxId: ", setCheckboxId);
 
   useEffect(() => {
     if (isSubmitting) {
@@ -38,21 +55,25 @@ const AddSpecialSetModal = (props) => {
         //prettier-ignore
         const element = document.querySelector(`#set-${setCheckboxId.split("-").at(-1)}`);
         element.checked = true;
+        element.dataset.valid = true;
       }
     }
-  }, [setCheckboxId, isSubmitting, values.reps, values.weight]);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [setCheckboxId, isSubmitting]);
 
   const toggleActiveWeight = (unit) => {
     setActiveWeight(unit);
     getWeightUnit(unit);
   };
 
-  const onSubmit = (event) => {
-    setTimeout(() => {
-      props.hideModalHandler();
-      props.addSetsHandler();
-    });
-  };
+  // const onSubmit = (event) => {
+  //   timer = setTimeout(() => {
+  //     props.hideModalHandler();
+  //     props.addSetsHandler();
+  //   });
+  // };
 
   return (
     <Fragment>
@@ -86,7 +107,10 @@ const AddSpecialSetModal = (props) => {
               <input
                 type="number"
                 name="reps"
-                className="kinetic-input-1-digit kinetic-input"
+                className={`kinetic-input-1-digit kinetic-input ${renderErrorClass(
+                  { errors, touched },
+                  "reps"
+                )}`}
                 defaultValue={0}
                 onChange={(event) => {
                   handleChange(event);
@@ -94,12 +118,18 @@ const AddSpecialSetModal = (props) => {
                 }}
               />
             </div>
+            <p className="error-message">
+              {renderErrorMessage(errors, "reps")}
+            </p>
             <div className={`form-group-flex`}>
               <h6 className="title-5 text-uppercase">Weight: </h6>
               <input
                 type="number"
                 name="weight"
-                className="kinetic-input-1-digit kinetic-input"
+                className={`kinetic-input-1-digit kinetic-input ${renderErrorClass(
+                  { errors, touched },
+                  "weight"
+                )}`}
                 defaultValue={0}
                 onChange={(event) => {
                   handleChange(event);
@@ -107,13 +137,21 @@ const AddSpecialSetModal = (props) => {
                 }}
               />
             </div>
-            <button
-              className={`btn btn--primary ${classes["special-set-modal__confirm"]}`}
-              type="submit"
-              onClick={onSubmit}
-            >
-              Confirm
-            </button>
+            <p className="error-message">
+              {renderErrorMessage(errors, "weight")}
+            </p>
+            <div className="flex-cta-wrapper justify-end mt-xs">
+              <SecondaryButton
+                onClick={props.onHide}
+                type="button"
+                variant="danger"
+              >
+                Cancel
+              </SecondaryButton>
+              <SecondaryButton type="submit" variant="primary">
+                Ok
+              </SecondaryButton>
+            </div>
           </div>
         </div>
       </form>

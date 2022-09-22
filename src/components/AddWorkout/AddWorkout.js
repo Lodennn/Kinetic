@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { Formik, Field, Form, useFormik } from "formik";
+import { useFormik } from "formik";
 
 import PrimaryButton from "../../core-ui/Buttons/PrimaryButton/PrimaryButton";
-import { setsType } from "../../data/setsType";
+import { defaultSetsValue, setsType } from "../../services/lookups";
 import AddSet from "../AddSet/AddSet";
 import TargetedMuscles from "../TargetedMuscles/TargetedMuscles";
 import ModalSecondary from "../../core-ui/ModalSecondary/ModalSecondary";
@@ -20,27 +20,46 @@ import DropsetForm from "../DropsetForm/DropsetForm";
 import AddSpecialSetModal from "../../core-ui/Modal/AddSpecialSetModal/AddSpecialSetModal";
 import SecondaryButton from "../../core-ui/Buttons/SecondaryButton/SecondaryButton";
 
-import WorkoutModel from "../../model/Workout";
 import { addWorkoutSetsValidation } from "../../services/validations";
-import { uncheckAll } from "../../helpers/form";
+import {
+  renderErrorClass,
+  renderErrorMessage,
+  uncheckAll,
+} from "../../helpers/form";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addWorkoutAction,
   workoutsActions,
 } from "../../store/workouts/workouts-slice";
-import { calculateInfoOfSets } from "../../services/workouts";
+import {
+  calculateInfoOfSets,
+  checkWorkoutProgressStatus,
+  filterWorkoutByName,
+} from "../../services/workouts";
+import { addWorkoutValidateFn } from "../../helpers/validate";
+import serviceError from "../../services/errors";
+// import useAddWorkoutValidations from "../../hooks/useAddWorkoutValidations";
+
+import * as Yup from "yup";
+import { targetedMuscleLookup } from "../../services/lookups";
+import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
+import useCrudWorkouts from "../../hooks/CRUDWorkouts";
 
 const AddWorkout = (props) => {
   const params = useParams();
-  const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.workouts);
 
-  const defaultSetsValue = { sets: [], filledSets: 0 };
+  const dispatch = useDispatch();
+
+  const { isLoading, addWorkoutForm } = useSelector((state) => state.workouts);
+
+  const { user } = useSelector((state) => state.auth);
 
   const [workoutName, setWorkoutName] = useState("");
   const [targetedMuscle, setTargetedMuscle] = useState("");
   const [activeSetsName, setActiveSetsName] = useState("");
+
+  const [setTypeEvent, setSetTypeEvent] = useState(null);
 
   const [numOfSets, setNumOfSets] = useState(defaultSetsValue);
   const [superSetNumOfSets, setSuperSetNumOfSets] = useState(defaultSetsValue);
@@ -57,6 +76,8 @@ const AddWorkout = (props) => {
   const setTypeElementRef = useRef(null);
 
   const addWorkoutFormRef = useRef(null);
+  const addWorkoutSuperFormRef = useRef(null);
+  const addWorkoutDropFormRef = useRef(null);
 
   // SECONDARY MODAL
   const { data, showModal, showModalHandler, hideModalHandler } = useReadData();
@@ -100,6 +121,36 @@ const AddWorkout = (props) => {
     }
   }, [activeSetsName, numOfSets]);
 
+  const addWorkoutFormInitialState = {
+    workoutName: "",
+    numberOfSets: 0,
+    targetedMuscle: "",
+    superSetWorkoutNameFlag: false,
+    superSetWorkoutName: "",
+    numberOfDropSetsFlag: false,
+    numberOfDropSets: "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    workoutName: Yup.string().required(serviceError.required),
+    numberOfSets: Yup.number()
+      .min(1, "The minimum amount is one")
+      .required(serviceError.required),
+    targetedMuscle: Yup.string().required(serviceError.required),
+    specialSetFlag: Yup.string(),
+    superSetWorkoutName: Yup.string().when("specialSetFlag", {
+      is: "superSetWorkoutNameFlag",
+      then: Yup.string().required("Must enter super set name"),
+    }),
+    numberOfDropSets: Yup.number().when("specialSetFlag", {
+      is: "numberOfDropSetsFlag",
+      then: Yup.number()
+        .positive()
+        .min(1)
+        .required("Must enter drop set number"),
+    }),
+  });
+
   const {
     values,
     errors,
@@ -108,19 +159,22 @@ const AddWorkout = (props) => {
     handleBlur,
     touched,
     isSubmitting,
+    setFieldValue,
   } = useFormik({
-    initialValues: {
-      workoutName: "",
-      numberOfSets: 0,
-      numberOfDropSets: 0,
-      targetedMuscle: "",
-      mainSets: null,
-      superSetWorkoutName: "",
-    },
-    onSubmit(values) {
+    initialValues: addWorkoutFormInitialState,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      const { isValid, validator } = addWorkoutSetsValidation(
+        addWorkoutFormRef.current
+      );
+      if (!isValid) {
+        console.log("NOT SUBMITTED");
+        return;
+      }
+      console.log("Submitted: ", values);
       const submittedData = {};
 
-      submittedData.userId = "090";
+      submittedData.userId = user.id;
       submittedData.dayId = params.dayId;
       submittedData.programId = params.programId;
       submittedData.hasNote = false;
@@ -129,11 +183,26 @@ const AddWorkout = (props) => {
       submittedData.numberOfSets = values.numberOfSets;
       submittedData.sets = numOfSets.sets;
       //prettier-ignore
-      submittedData.totalNumberOfWeight = calculateInfoOfSets(numOfSets.sets, 'weight');
+      submittedData.totalNumberOfWeight = calculateInfoOfSets(numOfSets.sets, "weight");
       //prettier-ignore
-      submittedData.totalNumberOfReps = calculateInfoOfSets(numOfSets.sets, 'reps');
-      submittedData.progressState = 0;
+      submittedData.totalNumberOfReps = calculateInfoOfSets(numOfSets.sets, "reps");
       submittedData.createdAt = new Date();
+      // new Date(
+      //   new Date().getFullYear(),
+      //   new Date().getMonth(),
+      //   new Date().getDate() - 1
+      // );
+
+      const typicalLastWorkout = filterWorkoutByName(
+        props.lastWorkouts,
+        values.workoutName
+      );
+      const progressStatus = checkWorkoutProgressStatus(
+        typicalLastWorkout,
+        submittedData
+      );
+
+      submittedData.progressState = progressStatus;
 
       if (activeSetsName === "Superset") {
         submittedData.isSpecialWorkout = true;
@@ -159,35 +228,23 @@ const AddWorkout = (props) => {
           totalNumberOfReps: calculateInfoOfSets(dropSetNumOfSets.sets, 'reps'),
         };
       } else {
-        submittedData.isSpecialWorkout = false;
+        submittedData.isSpecialWorkout = "";
         submittedData.superSet = {};
         submittedData.dropSet = {};
       }
 
-      const mainSetsValidator = addWorkoutSetsValidation(
-        addWorkoutFormRef.current
-      );
+      console.log("'''''''''''''''''''''''''''''''''''''''''''''''''''");
+      console.log("submittedData: ", submittedData);
 
-      if (
-        numOfSets.sets.length === 0 ||
-        (activeSetsName === "Superset" && superSetNumOfSets.sets.length === 0)
-      ) {
-        console.log("NO SUBMITTED");
-      } else {
-        console.log("submittedData: ", submittedData);
-        dispatch(
-          addWorkoutAction({
-            collection: "workouts",
-            postData: submittedData,
-          })
-        );
-        // dispatch(workoutActions.setWorkouts(submittedData));
-      }
-
-      // FORM VALIDATION !!
-
-      // alert("values: ", JSON.stringify(values));
+      dispatch(
+        addWorkoutAction({
+          collection: "workouts",
+          postData: submittedData,
+        })
+      ).then((_) => props.onHide());
     },
+    // validate: addWorkoutValidateFn,
+    validationSchema,
   });
 
   // MAIN
@@ -197,6 +254,7 @@ const AddWorkout = (props) => {
 
   // MAIN
   const onChangeNumberOfSets = useCallback((event) => {
+    if (+event.target.value < 0) return;
     uncheckAll(addWorkoutFormRef.current);
     handleChange(event);
     setNumOfSets((prevState) => ({
@@ -212,7 +270,7 @@ const AddWorkout = (props) => {
   // MAIN
   const onChangeNumberOfDropSet = useCallback((event) => {
     handleChange(event);
-    uncheckAll(addWorkoutFormRef.current);
+    uncheckAll(addWorkoutDropFormRef.current);
     setDropSetNumOfSets((prevState) => ({
       ...prevState,
       sets: Array(+event.target.value).fill({
@@ -226,6 +284,7 @@ const AddWorkout = (props) => {
   // MAIN
   const getActiveSetsTypeHandler = (type) => {
     let setsName = type === "super" ? "Superset" : "Dropset";
+
     if (setsName === "Superset") {
       setSuperSetNumOfSets((prevState) => ({
         ...prevState,
@@ -240,8 +299,17 @@ const AddWorkout = (props) => {
   };
 
   // MAIN
-  const toggleAnimationHandler = () => {
+  const toggleAnimationHandler = (setType) => {
+    setFieldValue("specialSetFlag", "");
+    // adding setTimeout to fix the bug of adding set type when check it
+    setTimeout(() => setFieldValue("specialSetFlag", ""));
+
     setActiveSetsName("");
+
+    //prettier-ignore
+    addWorkoutFormRef.current.querySelectorAll(`input[name='specialSetFlag']`).forEach(input => input.checked = false);
+    //prettier-ignore
+    addWorkoutFormRef.current.querySelectorAll(`input[name='specialSetFlag']`).forEach(input => input.checked = false);
   };
 
   const resetUserSecondaryInputs = () => {
@@ -345,28 +413,24 @@ const AddWorkout = (props) => {
     handleChange(event);
   };
 
-  const submitHandler = (e) => {
-    // e.preventDefault();
-    // if (
-    //   numOfSets.sets.length === 0 ||
-    //   (activeSetsName === "Superset" && superSetNumOfSets.sets.length === 0)
-    // ) {
-    //   console.log("NO SUBMITTED");
-    // } else {
-    //   console.log("Submit");
-    // }
-    // const mainSetsValidator = addWorkoutSetsValidation(
-    //   addWorkoutFormRef.current
-    // );
-    // // FORM VALIDATION !!
+  const onChangeCheckboxSetType = (event, setType) => {
+    setSetTypeEvent(event);
+
+    if (setType === "super") {
+      setFieldValue("specialSetFlag", "superSetWorkoutNameFlag");
+      setFieldValue("numberOfDropSets", 0);
+      handleChange(event);
+    } else {
+      setFieldValue("specialSetFlag", "numberOfDropSetsFlag");
+      setFieldValue("superSetWorkoutName", "");
+      handleChange(event);
+    }
   };
 
   return (
     <Fragment>
       {showModal && (
-        <ModalSecondary
-        // onHide={hideModalHandler}
-        >
+        <ModalSecondary>
           <AddSpecialSetModal
             onChangeUserNumberOfWeight={onChangeUserNumberOfWeight}
             onChangeUserNumberOfReps={onChangeUserNumberOfReps}
@@ -374,6 +438,7 @@ const AddWorkout = (props) => {
             addSetsHandler={addSetsHandler}
             getWeightUnit={getWeightUnit}
             setCheckboxId={data.setCheckboxId}
+            onHide={hideModalHandler}
           />
         </ModalSecondary>
       )}
@@ -389,23 +454,37 @@ const AddWorkout = (props) => {
               <div className="form-group mb-xxg">
                 <input
                   type="text"
-                  className="form-control kinetic-input"
+                  className={`form-control kinetic-input ${renderErrorClass(
+                    { errors, touched },
+                    "workoutName"
+                  )}`}
                   placeholder="Workout Name"
                   name="workoutName"
                   value={values.workoutName}
                   onChange={onChangeWorkoutName}
                 />
+                <p className="error-message">
+                  {renderErrorMessage(errors, "workoutName")}
+                </p>
               </div>
               <div className="form-group  mb-xxg">
                 <h4 className="title-4 text-uppercase mb-sm">
                   Targeted Muscle:{" "}
                 </h4>
                 <TargetedMuscles
-                  muscles={["Chest", "Back", "Triceps", "Biceps"]}
+                  muscles={targetedMuscleLookup}
                   addTargetedMuscle={addTargetedMuscle}
                   value={values.targetedMuscle}
                   onChange={onChangeTargetedMuscle}
+                  className={renderErrorClass(
+                    { errors, touched },
+                    "targetedMuscle"
+                  )}
                 />
+
+                <p className="error-message">
+                  {renderErrorMessage(errors, "targetedMuscle")}
+                </p>
               </div>
               <div className="mb-xxg">
                 <div className={`form-group-flex`}>
@@ -413,11 +492,18 @@ const AddWorkout = (props) => {
                   <input
                     type="number"
                     name="numberOfSets"
-                    className="kinetic-input-1-digit kinetic-input "
+                    className={`kinetic-input-1-digit kinetic-input ${renderErrorClass(
+                      { errors, touched },
+                      "numberOfSets"
+                    )}`}
                     defaultValue={0}
+                    min={0}
                     onChange={onChangeNumberOfSets}
                   />
                 </div>
+                <p className="error-message">
+                  {renderErrorMessage(errors, "numberOfSets")}
+                </p>
                 <div style={{ display: "flex", gap: "3rem" }}>
                   {numOfSets.sets.map((set, idx) => {
                     return (
@@ -451,7 +537,18 @@ const AddWorkout = (props) => {
                     setType={set.type}
                     getActiveSetsTypeHandler={getActiveSetsTypeHandler}
                     type="button"
+                    disabled={isLoading}
                   >
+                    <input
+                      className={`addworkout-checkbox-hack addworkout-checkbox-hack--${set.type}`}
+                      type="radio"
+                      name={"specialSetFlag"}
+                      id={set.formName}
+                      onChange={(event) =>
+                        onChangeCheckboxSetType(event, set.type)
+                      }
+                      value={set.formName}
+                    />
                     {set.name}
                   </PrimaryButton>
                 );
@@ -460,16 +557,16 @@ const AddWorkout = (props) => {
 
             <div className="flex-cta-wrapper">
               <SecondaryButton
-                onClick={() => console.log("CANCEL")}
+                onClick={props.onHide}
+                type="button"
                 variant="danger"
+                disabled={isLoading}
               >
-                Cancel
+                {isLoading ? <LoadingSpinner size={"sm"} /> : "Cancel"}
               </SecondaryButton>
-              {!isLoading && (
-                <SecondaryButton onClick={submitHandler} type="submit">
-                  Ok
-                </SecondaryButton>
-              )}
+              <SecondaryButton type="submit" disabled={isLoading}>
+                {isLoading ? <LoadingSpinner size={"sm"} /> : "Ok"}
+              </SecondaryButton>
             </div>
 
             {/* SPECIAL SET TYPE */}
@@ -492,6 +589,16 @@ const AddWorkout = (props) => {
                       }`}
                       onClick={getActiveSetsTypeHandler.bind(null, set.type)}
                     >
+                      <input
+                        id={set.formName}
+                        type="radio"
+                        name={"specialSetFlag"}
+                        className={`addworkout-checkbox-hack addworkout-checkbox-hack--${set.type}`}
+                        onChange={(event) =>
+                          onChangeCheckboxSetType(event, set.type)
+                        }
+                        value={set.formName}
+                      />
                       {set.type === "super" ? (
                         <SupersetIcon />
                       ) : (
@@ -507,16 +614,28 @@ const AddWorkout = (props) => {
                 <div className="set-type__form p-md">
                   {activeSetsName === "Superset" ? (
                     <SupersetForm
+                      ref={addWorkoutSuperFormRef}
                       numOfSets={numOfSets.sets.length}
                       sets={superSetNumOfSets.sets}
                       showModalForSuperSets={showModalForSuperSets}
                       onChangeWorkoutName={onChangeSupersetWorkoutName}
+                      errors={errors}
+                      className={renderErrorClass(
+                        { errors, touched },
+                        "superSetWorkoutName"
+                      )}
                     />
                   ) : (
                     <DropsetForm
+                      ref={addWorkoutDropFormRef}
                       onChangeNumberOfDropSet={onChangeNumberOfDropSet}
                       dropSetNumOfSets={dropSetNumOfSets.sets}
                       showModalForDropSets={showModalForDropSets}
+                      errors={errors}
+                      className={renderErrorClass(
+                        { errors, touched },
+                        "numberOfDropSets"
+                      )}
                     />
                   )}
                 </div>
@@ -524,16 +643,18 @@ const AddWorkout = (props) => {
                   <hr />
                   <div className="flex-cta-wrapper justify-end mt-xs">
                     <SecondaryButton
-                      onClick={() => console.log("CANCEL")}
+                      onClick={props.onHide}
                       variant="secondary"
+                      disabled={isLoading}
                     >
-                      Cancel
+                      {isLoading ? <LoadingSpinner size={"sm"} /> : "Cancel"}
                     </SecondaryButton>
                     <SecondaryButton
-                      onClick={submitHandler}
+                      type="submit"
                       variant="secondary"
+                      disabled={isLoading}
                     >
-                      Ok
+                      {isLoading ? <LoadingSpinner size={"sm"} /> : "Ok"}
                     </SecondaryButton>
                   </div>
                 </div>

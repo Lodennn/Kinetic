@@ -25,8 +25,8 @@ const AddSet = (props) => {
             id={`set-${randomSetCheckboxId.current}`}
             name={`set-checkbox-${randomSetCheckboxId.current}`}
             value={`set-checkbox`}
-            className="checkbox__sets"
-            onChange={onChange && onChange}
+            className="checkbox__sets set-checkbox"
+            onChange={onChange || onChange}
           />
           <span>{reps}</span>
           {weight && (

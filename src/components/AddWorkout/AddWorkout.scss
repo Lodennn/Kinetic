@@ -98,6 +98,7 @@
       width: 3rem;
       cursor: pointer;
       transition: width 0.5s ease;
+      position: relative;
 
       &.active {
         width: 6rem;

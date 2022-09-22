@@ -8,9 +8,9 @@ const WorkoutNote = (props) => {
   return (
     <div className="add-note p-md">
       {props.workoutDetails.hasNote ? (
-        <ViewNote />
+        <ViewNote onHide={props.onHide} />
       ) : (
-        <AddNote workoutId={props.workoutDetails.id} />
+        <AddNote workoutId={props.workoutDetails.id} onHide={props.onHide} />
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { postDocument } from "../../services/api";
-import { updateWorkoutAction } from "../workouts/workouts-slice";
+import { addNoteToWorkoutAction } from "../workouts/workouts-slice";
 
 export const addNoteAction = createAsyncThunk(
   "notes/addNote",
@@ -8,8 +8,7 @@ export const addNoteAction = createAsyncThunk(
     try {
       await postDocument({ collection: "notes", postData: payload }).then(
         (data) => {
-          console.log("notes-slice data - ", data);
-          dispatch(updateWorkoutAction(data));
+          dispatch(addNoteToWorkoutAction(data));
         }
       );
     } catch (err) {
@@ -29,14 +28,12 @@ const notesSlice = createSlice({
   initialState,
   extraReducers: {
     [addNoteAction.pending]: (state, action) => {
-      console.log("PENDING: ", action.payload);
+      state.isLoading = true;
     },
     [addNoteAction.fulfilled]: (state, action) => {
-      console.log("FULFILLED: ", action.payload);
+      state.isLoading = false;
     },
-    [addNoteAction.rejected]: (state, action) => {
-      console.log("REJECTED: ", action.payload);
-    },
+    [addNoteAction.rejected]: (state, action) => {},
   },
 });
 

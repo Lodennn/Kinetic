@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatDate, resetDate } from "../../services/dates";
+import { yesterday } from "../../services/lookups";
 import classes from "./WorkoutsDateSlider.module.scss";
 
 const WorkoutsDateSlider = (props) => {
@@ -7,11 +8,12 @@ const WorkoutsDateSlider = (props) => {
 
   const [activeDate, setActiveDate] = useState(propsDate);
 
-  useEffect(() => {
-    // let newActiveDate = dates.find(
-    //   (date) => resetDate(new Date(propsDate)) === resetDate(new Date(date))
-    // );
+  const humanReadableDateFormat = () => {
+    if (resetDate(new Date()) === resetDate(activeDate)) return "Today";
+    return formatDate(activeDate);
+  };
 
+  useEffect(() => {
     setActiveDate(new Date(propsDate));
   }, [propsDate]);
 
@@ -21,7 +23,7 @@ const WorkoutsDateSlider = (props) => {
         {" "}
         {"<"}{" "}
       </div>
-      <div>{formatDate(activeDate)}</div>
+      <div>{humanReadableDateFormat()}</div>
       <div
         className={classes["date-slider__right-arrow"]}
         onClick={getNextDate}

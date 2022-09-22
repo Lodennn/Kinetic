@@ -18,6 +18,7 @@ import programImage5 from "./../../assets/images/program-image-5.png";
 import programImgeBackground5 from "./../../assets/images/program-bg-5.png";
 
 import classes from "./HomePagae.module.scss";
+import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
 
 // const programData = [
 //   {
@@ -62,8 +63,9 @@ const HomePage = () => {
       <PageIntro subTitle="Select Your" mainTitle="Program" />
       <div className="container">
         <div className={`section`}>
+          {isLoading && <LoadingSpinner />}
           {!isLoading &&
-            programsData.length !== 0 &&
+            programsData?.length !== 0 &&
             programsData.map((program, idx) => (
               <Program
                 key={program.id}

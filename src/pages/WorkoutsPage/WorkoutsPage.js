@@ -1,5 +1,7 @@
 import { Fragment, useEffect, useReducer } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+
 import AddWorkout from "../../components/AddWorkout/AddWorkout";
 import Workout from "../../components/Workout/Workout";
 import FloatingCTA from "../../core-ui/FloatingCTA/FloatingCTA";
@@ -9,29 +11,39 @@ import useReadData from "../../hooks/useReadData";
 
 import { ReactComponent as PlusIcon } from "../../assets/icons/PLUS.svg";
 
-import { useParams } from "react-router-dom";
-
 import WorkoutDetails from "../../components/WorkoutDetails/WorkoutDetails";
 import WorkoutsDateSlider from "../../components/WorkoutsDateSlider/WorkoutsDateSlider";
 import {
   filterWorkotusByDate,
   getAvailableDatesInDay,
+  getWorkoutByDate,
 } from "../../services/workouts";
 import { getWorkoutsAction } from "../../store/workouts/workouts-slice";
 import { resetDate } from "../../services/dates";
+import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
+import { useState } from "react";
 
 const WorkoutsPage = () => {
   const { programId, dayId } = useParams();
 
   const dispatch = useDispatch();
 
+  const { user } = useSelector((state) => state.auth);
+
   useEffect(() => {
-    dispatch(getWorkoutsAction({ programId, dayId }));
+    dispatch(getWorkoutsAction({ programId, dayId, userId: user.id }));
   }, []);
 
-  const { workouts } = useSelector((state) => state.workouts);
+  const { workouts, isLoading } = useSelector((state) => state.workouts);
+
+  const [addSpecialMainSetOnEditMode, setAddSpecialMainSetOnEditMode] =
+    useState(null);
 
   const availableDates = getAvailableDatesInDay(workouts, programId, dayId);
+
+  const lastWorkoutDate = availableDates.at(-2);
+
+  const lastWorkouts = getWorkoutByDate(workouts, lastWorkoutDate);
 
   const initialState = { date: new Date() };
 
@@ -65,6 +77,13 @@ const WorkoutsPage = () => {
     hideModalHandler: hideWorkoutDetailsModalHandler,
   } = useReadData(workouts);
 
+  const {
+    data: editWorkoutDetails,
+    showModal: showEditWorkoutModal,
+    showModalHandler: showEditWorkoutModalHandler,
+    hideModalHandler: hideEditWorkoutModalHandler,
+  } = useReadData(workouts);
+
   const getActiveDateIndex = () => {
     let activeDate = resetDate(workoutFilteredDateR.date);
     let activeDateIndex = availableDates.findIndex(
@@ -95,14 +114,25 @@ const WorkoutsPage = () => {
 
       {showModal && (
         <Modal onHide={hideModalHandler}>
-          <AddWorkout />
+          <AddWorkout lastWorkouts={lastWorkouts} onHide={hideModalHandler} />
         </Modal>
       )}
+
       {showWorkoutDetailsModal && (
         <Modal onHide={hideWorkoutDetailsModalHandler} modalToUse="read">
           <WorkoutDetails workoutDetails={workoutDetails} />
         </Modal>
       )}
+
+      {showEditWorkoutModal && (
+        <Modal onHide={hideEditWorkoutModalHandler} modalToUse="read">
+          <WorkoutDetails
+            workoutDetails={editWorkoutDetails}
+            isEditing={true}
+          />
+        </Modal>
+      )}
+
       <Fragment>
         <WorkoutsDateSlider
           date={workoutFilteredDateR.date}
@@ -111,19 +141,24 @@ const WorkoutsPage = () => {
           getNextDate={getNextDate}
         />
         <div className="section container">
-          {filteredWorkouts.map((workout) => {
-            return (
-              <Workout
-                key={workout.id}
-                {...workout}
-                onClick={showWorkoutDetailsModalHandler}
-              />
-            );
-          })}
+          {isLoading && <LoadingSpinner />}
+          {!isLoading &&
+            filteredWorkouts.map((workout) => {
+              return (
+                <Workout
+                  key={workout.id}
+                  {...workout}
+                  onClick={showWorkoutDetailsModalHandler}
+                  onEdit={showEditWorkoutModalHandler}
+                />
+              );
+            })}
         </div>
       </Fragment>
 
-      <FloatingCTA onClick={showModalHandler} icon={<PlusIcon />} />
+      {resetDate(workoutFilteredDateR.date) === resetDate(new Date()) && (
+        <FloatingCTA onClick={showModalHandler} icon={<PlusIcon />} />
+      )}
     </div>
   );
 };

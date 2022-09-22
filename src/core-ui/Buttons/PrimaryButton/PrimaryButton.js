@@ -11,6 +11,7 @@ const PrimaryButton = (props) => {
       className={`${classes["primary-btn"]}`}
       onClick={props.getActiveSetsTypeHandler.bind(null, props.setType)}
       type={props.type}
+      disabled={props.disabled}
     >
       <div className={classes["primary-btn__icon"]}>{renderedIcon}</div>
       <span className={`${classes["primary-btn__text"]}`}>

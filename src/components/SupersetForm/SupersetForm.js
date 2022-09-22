@@ -1,8 +1,9 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import WorkoutDataItem from "../../core-ui/WorkoutDataItem/WorkoutDataItem";
+import { renderErrorMessage } from "../../helpers/form";
 import AddSet from "../AddSet/AddSet";
 
-const Superset = (props) => {
+const Superset = forwardRef((props, ref) => {
   const {
     sets,
     showModalForSuperSets,
@@ -11,19 +12,26 @@ const Superset = (props) => {
     totalNumberOfReps,
     toUse,
     onChangeWorkoutName,
+    errors,
+    className,
   } = props;
 
   return (
-    <div className="set-type__form--super">
+    <div className="set-type__form--super" ref={ref}>
       <div className="form-group">
         {toUse !== "read" ? (
-          <input
-            type="text"
-            name="superSetWorkoutName"
-            className="form-control kinetic-input kinetic-input--white mb-lg"
-            placeholder="Workout Name"
-            onChange={onChangeWorkoutName}
-          />
+          <>
+            <input
+              type="text"
+              name="superSetWorkoutName"
+              className={`form-control kinetic-input kinetic-input--white mb-lg ${className}`}
+              placeholder="Workout Name"
+              onChange={onChangeWorkoutName}
+            />
+            <p className="error-message">
+              {renderErrorMessage(errors, "superSetWorkoutName")}
+            </p>
+          </>
         ) : (
           <div className="form-control kinetic-input kinetic-input--white mb-lg">
             {superSetWorkoutName}
@@ -56,6 +64,6 @@ const Superset = (props) => {
       )}
     </div>
   );
-};
+});
 
 export default Superset;

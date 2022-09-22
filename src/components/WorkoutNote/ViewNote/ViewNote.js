@@ -17,9 +17,7 @@ const ViewNote = (props) => {
         <SecondaryButton onClick={() => console.log("DELETE")} variant="danger">
           Delete
         </SecondaryButton>
-        <SecondaryButton onClick={() => console.log("Edit")}>
-          Edit
-        </SecondaryButton>
+        <SecondaryButton onClick={props.onHide}>Edit</SecondaryButton>
       </div>
     </div>
   );

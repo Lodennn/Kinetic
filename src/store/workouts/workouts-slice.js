@@ -3,6 +3,7 @@ import { Firestore } from "firebase/firestore";
 import db from "../../config/database";
 import { workouts } from "../../data/workouts";
 import {
+  deleteDocument,
   getCollection,
   getWorkouts,
   postDocument,
@@ -17,6 +18,7 @@ const initialState = {
   error: null,
   workouts: [],
   filteredWorkouts: [],
+  addWorkoutForm: { form: null, isFormSetted: false },
 };
 
 //prettier-ignore
@@ -29,12 +31,22 @@ export const addWorkoutAction = createAsyncThunk("workouts/addWorkout", async (d
   }
 );
 
+//prettier-ignore
+export const deleteWorkoutAction = createAsyncThunk('workouts/deleteWorkout', async (data, {dispatch, getState}) => {
+  try {
+    await deleteDocument({collectionName: 'workouts', documentId: data.documentId})
+          .then(_ => dispatch(workoutsActions.deleteWorkout(data.documentId)))
+  } catch(error) {
+    console.error(error);
+  }
+})
+
 export const getWorkoutsAction = createAsyncThunk(
   "workouts/getWorkouts",
   async (payload, thunkAPI) => {
     try {
-      const { programId, dayId } = payload;
-      const workouts = await getWorkouts(programId, dayId);
+      const { programId, dayId, userId } = payload;
+      const workouts = await getWorkouts(programId, dayId, userId);
 
       return workouts.map((workout) => ({
         ...workout,
@@ -46,8 +58,8 @@ export const getWorkoutsAction = createAsyncThunk(
   }
 );
 
-export const updateWorkoutAction = createAsyncThunk(
-  "workouts/updateWorkout",
+export const addNoteToWorkoutAction = createAsyncThunk(
+  "workouts/addNoteToWorkout",
   async (payload, { getState, dispatch }) => {
     try {
       const appropriatePayload = {
@@ -57,9 +69,8 @@ export const updateWorkoutAction = createAsyncThunk(
         updatedFieldValue: true,
       };
       await updateDocumentField(appropriatePayload).then((data) => {
-        console.log("workouts-slice data: ", data);
         dispatch(
-          workoutsActions.updateWorkout({ workoutId: payload.workoutId })
+          workoutsActions.addNoteToWorkout({ workoutId: payload.workoutId })
         );
       });
     } catch (err) {
@@ -72,10 +83,13 @@ const workoutsSlice = createSlice({
   name: "workouts",
   initialState,
   reducers: {
+    setAddWorkoutForm: (state, action) => {
+      state.addWorkoutForm = { form: action.payload, isFormSetted: true };
+    },
     setWorkouts: (state, action) => {
       state.workouts.unshift(action.payload);
     },
-    updateWorkout: (state, action) => {
+    addNoteToWorkout: (state, action) => {
       const updatedWorkoutIndex = state.workouts.findIndex(
         (workout) => workout.id === action.payload.workoutId
       );
@@ -86,6 +100,11 @@ const workoutsSlice = createSlice({
         ...updatedWorkout,
         hasNote: true,
       };
+    },
+    deleteWorkout: (state, action) => {
+      state.workouts = state.workouts.filter(
+        (workout) => workout.id !== action.payload
+      );
     },
   },
   extraReducers: {
@@ -108,13 +127,22 @@ const workoutsSlice = createSlice({
     [addWorkoutAction.rejected]: (state, action) => {
       state.error = action.error;
     },
-    [updateWorkoutAction.pending]: (state, action) => {
+    [addNoteToWorkoutAction.pending]: (state, action) => {
       state.isLoading = true;
     },
-    [updateWorkoutAction.fulfilled]: (state, action) => {
+    [addNoteToWorkoutAction.fulfilled]: (state, action) => {
       state.isLoading = false;
     },
-    [updateWorkoutAction.rejected]: (state, action) => {
+    [addNoteToWorkoutAction.rejected]: (state, action) => {
+      state.error = action.error;
+    },
+    [deleteWorkoutAction.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    [deleteWorkoutAction.fulfilled]: (state, action) => {
+      state.isLoading = false;
+    },
+    [deleteWorkoutAction.rejected]: (state, action) => {
       state.error = action.error;
     },
   },

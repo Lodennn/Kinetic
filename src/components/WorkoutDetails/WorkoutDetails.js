@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useCallback, useRef } from "react";
 import AddSet from "../AddSet/AddSet";
 import TargetedMuscles from "../TargetedMuscles/TargetedMuscles";
 
@@ -15,6 +15,10 @@ import useReadData from "../../hooks/useReadData";
 import ModalSecondary from "../../core-ui/ModalSecondary/ModalSecondary";
 import WorkoutNote from "../WorkoutNote/WorkoutNote";
 import WorkoutDataItem from "../../core-ui/WorkoutDataItem/WorkoutDataItem";
+import { defaultSetsValue, targetedMuscleLookup } from "../../services/lookups";
+import { useState } from "react";
+import AddSpecialSetModal from "../../core-ui/Modal/AddSpecialSetModal/AddSpecialSetModal";
+import useCrudWorkouts from "../../hooks/CRUDWorkouts";
 
 const WorkoutDetails = (props) => {
   const {
@@ -29,9 +33,128 @@ const WorkoutDetails = (props) => {
     hasNote,
   } = props.workoutDetails;
 
-  const { data, showModal, showModalHandler, hideModalHandler } = useReadData();
+  const { data, showModal, showModalHandler, hideModalHandler } = useReadData(); // SECONDARY MODAL
 
   let activeSetsName = !!superSet.numberOfSets ? "Superset" : "Dropset";
+
+  // editing variables
+  // const [returnedSets, setReturnedSets] = useState({ sets, filledSets: 0 });
+  // const [userSetsType, setUserSetsType] = useState("");
+  // const userNumberOfWeight = useRef("");
+  // const userNumberOfReps = useRef("");
+  // const weightUnitRef = useRef("kg");
+  const {
+    data: editData,
+    showModal: editShowModal,
+    showModalHandler: editShowModalHandler,
+    hideModalHandler: editHideModalHandler,
+  } = useReadData();
+
+  const {
+    returnedSets,
+    setReturnedSets,
+    userSetsType,
+    userNumberOfWeight,
+    userNumberOfReps,
+    weightUnitRef,
+    showModalForMainSets,
+    getWeightUnit,
+    onChangeUserNumberOfReps,
+    onChangeUserNumberOfWeight,
+  } = useCrudWorkouts(sets, editShowModalHandler);
+
+  // editing functions
+  const onEditSets = (event) => {
+    const value = +event.target.value;
+    if (value < numberOfSets) return;
+
+    if (value > returnedSets.sets.length) {
+      setReturnedSets((prevState) => ({
+        ...prevState,
+        sets: [...prevState.sets, defaultSetsValue],
+      }));
+    }
+    if (value < returnedSets.sets.length) {
+      setReturnedSets((prevState) => {
+        let resetPrevState = [...returnedSets.sets.slice(0, numberOfSets)];
+
+        let newState = resetPrevState.concat(
+          Array(Math.abs(value - numberOfSets)).fill(defaultSetsValue)
+        );
+
+        return { ...prevState, sets: newState };
+      });
+    }
+  };
+  // const resetUserSecondaryInputs = () => {
+  //   userNumberOfReps.current = 0;
+  //   userNumberOfWeight.current = 0;
+  // };
+  // MAIN
+  // const showModalForMainSets = (data) => {
+  //   resetUserSecondaryInputs();
+  //   setUserSetsType("main");
+  //   editShowModalHandler(data);
+  // };
+
+  // const getWeightUnit = useCallback((unit) => {
+  //   weightUnitRef.current = unit;
+  // }, []);
+
+  // SECONDARY MODAL
+  // const onChangeUserNumberOfReps = (event) => {
+  //   userNumberOfReps.current = event.target.value;
+  // };
+
+  // SECONDARY MODAL
+  // const onChangeUserNumberOfWeight = (event) => {
+  //   userNumberOfWeight.current = event.target.value;
+  // };
+
+  console.log("editData: ", returnedSets, editData);
+
+  // SECONDARY MODAL
+  const addSetsHandler = () => {
+    if (userSetsType === "main") {
+      setReturnedSets((prevState) => {
+        prevState.sets[editData.setId] = {
+          weight: userNumberOfWeight.current,
+          reps: userNumberOfReps.current,
+          weightUnit: weightUnitRef.current,
+        };
+        return {
+          sets: [...prevState.sets],
+          filledSets: prevState.filledSets + 1,
+        };
+      });
+    } else if (userSetsType === "super") {
+      // setSuperSetNumOfSets((prevState) => {
+      //   prevState.sets[editData.setId] = {
+      //     weight: userNumberOfWeight.current,
+      //     reps: userNumberOfReps.current,
+      //     weightUnit: weightUnitRef.current,
+      //   };
+      //   return {
+      //     sets: [...prevState.sets],
+      //     filledSets: prevState.filledSets + 1,
+      //   };
+      // });
+      // setDropSetNumOfSets(defaultSetsValue);
+    } else if (userSetsType === "drop") {
+      // setDropSetNumOfSets((prevState) => {
+      //   prevState.sets[editData.setId] = {
+      //     weight: userNumberOfWeight.current,
+      //     reps: userNumberOfReps.current,
+      //     weightUnit: weightUnitRef.current,
+      //   };
+      //   return {
+      //     sets: [...prevState.sets],
+      //     filledSets: prevState.filledSets + 1,
+      //   };
+      // });
+      // setSuperSetNumOfSets(defaultSetsValue);
+    }
+  };
 
   return (
     <Fragment>
@@ -40,7 +163,20 @@ const WorkoutDetails = (props) => {
           onHide={hideModalHandler}
           modalToUse={hasNote ? "read" : ""}
         >
-          <WorkoutNote workoutDetails={data} />
+          <WorkoutNote workoutDetails={data} onHide={hideModalHandler} />
+        </ModalSecondary>
+      )}
+      {editShowModal && (
+        <ModalSecondary>
+          <AddSpecialSetModal
+            onChangeUserNumberOfWeight={onChangeUserNumberOfWeight}
+            onChangeUserNumberOfReps={onChangeUserNumberOfReps}
+            hideModalHandler={editHideModalHandler}
+            addSetsHandler={addSetsHandler}
+            getWeightUnit={getWeightUnit}
+            setCheckboxId={editData.setCheckboxId}
+            onHide={editHideModalHandler}
+          />
         </ModalSecondary>
       )}
       <div className="p-md">
@@ -52,39 +188,92 @@ const WorkoutDetails = (props) => {
             <NoteIcon />
           </button>
           <div className="form-group mb-xxg">
-            <h3 className="title-3 kinetic-input">
-              {props.workoutDetails.workoutName}
-            </h3>
+            {props.isEditing ? (
+              <div className="form-group mb-xxg">
+                <input
+                  type="text"
+                  className={`form-control kinetic-input `}
+                  placeholder="Workout Name"
+                  name="workoutName"
+                  value={props.workoutDetails.workoutName}
+                  // onChange={onChangeWorkoutName}
+                />
+                <p className="error-message">
+                  {/* {renderErrorMessage(errors, "workoutName")} */}
+                </p>
+              </div>
+            ) : (
+              <h3 className="title-3 kinetic-input">
+                {props.workoutDetails.workoutName}
+              </h3>
+            )}
           </div>
           <div className="form-group  mb-xxg">
             <h4 className="title-4 text-uppercase mb-sm">Targeted Muscle: </h4>
-            <TargetedMuscles muscles={[props.workoutDetails.category]} />
+            {props.isEditing ? (
+              <TargetedMuscles
+                muscles={targetedMuscleLookup}
+                activeMuscle={props.workoutDetails.category}
+                // addTargetedMuscle={addTargetedMuscle}
+                // value={values.targetedMuscle}
+                // onChange={onChangeTargetedMuscle}
+                // className={renderErrorClass(
+                //   { errors, touched },
+                //   "targetedMuscle"
+                // )}
+              />
+            ) : (
+              <TargetedMuscles muscles={[props.workoutDetails.category]} />
+            )}
           </div>
           <div className="mb-xxg">
             <div className={`form-group-flex`}>
               <h4 className="title-4 text-uppercase">Num of sets: </h4>
-              <span className="kinetic-input-1-digit kinetic-input">
-                {numberOfSets}
-              </span>
+              {props.isEditing ? (
+                <>
+                  <div className={`form-group-flex`}>
+                    <input
+                      type="number"
+                      name="numberOfSets"
+                      className={`kinetic-input-1-digit kinetic-input`}
+                      defaultValue={numberOfSets}
+                      min={numberOfSets}
+                      // onChange={onChangeNumberOfSets}
+                      onChange={onEditSets}
+                    />
+                  </div>
+                  <p className="error-message">
+                    {/* {renderErrorMessage(errors, "numberOfSets")} */}
+                  </p>
+                </>
+              ) : (
+                <span className="kinetic-input-1-digit kinetic-input">
+                  {numberOfSets}
+                </span>
+              )}
             </div>
             <div style={{ display: "flex", gap: "3rem" }}>
-              {sets.map((set, idx) => {
+              {returnedSets.sets.map((set, idx) => {
                 return (
                   <AddSet
+                    id={idx}
                     key={idx}
                     numOfSets={numberOfSets}
-                    sets={sets}
+                    sets={returnedSets.sets}
                     reps={set.reps}
                     weight={set.weight}
                     weightUnit={set.weightUnit}
+                    showModalHandler={showModalForMainSets}
                   />
                 );
               })}
             </div>
-            <div className="mt-xxg flex gap-sm">
-              <WorkoutDataItem type="weight" data={totalNumberOfWeight} />
-              <WorkoutDataItem type="reps" data={totalNumberOfReps} />
-            </div>
+            {!props.isEditing && (
+              <div className="mt-xxg flex gap-sm">
+                <WorkoutDataItem type="weight" data={totalNumberOfWeight} />
+                <WorkoutDataItem type="reps" data={totalNumberOfReps} />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -126,14 +315,14 @@ const WorkoutDetails = (props) => {
                     totalNumberOfReps={superSet.totalNumberOfReps}
                     superSetWorkoutName={superSet.workoutName}
                     sets={superSet.sets}
-                    toUse="read"
+                    toUse={props.isEditing ? "edit" : "read"}
                   />
                 ) : (
                   <DropsetForm
                     dropSetNumOfSets={dropSet.sets}
                     totalNumberOfWeight={dropSet.totalNumberOfWeight}
                     totalNumberOfReps={dropSet.totalNumberOfReps}
-                    toUse="read"
+                    toUse={props.isEditing ? "edit" : "read"}
                   />
                 )}
               </div>
