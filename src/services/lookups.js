@@ -23,3 +23,23 @@ export const setsType = [
 ];
 
 export const defaultSetsValue = { sets: [], filledSets: 0 };
+
+export const addWorkoutFormInitialState = {
+  workoutName: "",
+  numberOfSets: 0,
+  targetedMuscle: "",
+  superSetWorkoutNameFlag: false,
+  superSetWorkoutName: "",
+  numberOfDropSetsFlag: false,
+  numberOfDropSets: "",
+};
+
+export const editWorkoutFormInitialState = (props) => ({
+  workoutName: props.workoutDetails.workoutName,
+  numberOfSets: props.workoutDetails.numberOfSets,
+  targetedMuscle: props.workoutDetails.category,
+  superSetWorkoutNameFlag: false,
+  superSetWorkoutName: props.workoutDetails.superSet.workoutName || "",
+  numberOfDropSetsFlag: false,
+  numberOfDropSets: props.workoutDetails.dropSet.numberOfSets || "",
+});

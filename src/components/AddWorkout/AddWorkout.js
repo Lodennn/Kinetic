@@ -2,7 +2,11 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 
 import PrimaryButton from "../../core-ui/Buttons/PrimaryButton/PrimaryButton";
-import { defaultSetsValue, setsType } from "../../services/lookups";
+import {
+  addWorkoutFormInitialState,
+  defaultSetsValue,
+  setsType,
+} from "../../services/lookups";
 import AddSet from "../AddSet/AddSet";
 import TargetedMuscles from "../TargetedMuscles/TargetedMuscles";
 import ModalSecondary from "../../core-ui/ModalSecondary/ModalSecondary";
@@ -45,6 +49,7 @@ import * as Yup from "yup";
 import { targetedMuscleLookup } from "../../services/lookups";
 import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
 import useCrudWorkouts from "../../hooks/CRUDWorkouts";
+import { workoutValidationSchema } from "../../services/validationSchema";
 
 const AddWorkout = (props) => {
   const params = useParams();
@@ -121,35 +126,25 @@ const AddWorkout = (props) => {
     }
   }, [activeSetsName, numOfSets]);
 
-  const addWorkoutFormInitialState = {
-    workoutName: "",
-    numberOfSets: 0,
-    targetedMuscle: "",
-    superSetWorkoutNameFlag: false,
-    superSetWorkoutName: "",
-    numberOfDropSetsFlag: false,
-    numberOfDropSets: "",
-  };
-
-  const validationSchema = Yup.object().shape({
-    workoutName: Yup.string().required(serviceError.required),
-    numberOfSets: Yup.number()
-      .min(1, "The minimum amount is one")
-      .required(serviceError.required),
-    targetedMuscle: Yup.string().required(serviceError.required),
-    specialSetFlag: Yup.string(),
-    superSetWorkoutName: Yup.string().when("specialSetFlag", {
-      is: "superSetWorkoutNameFlag",
-      then: Yup.string().required("Must enter super set name"),
-    }),
-    numberOfDropSets: Yup.number().when("specialSetFlag", {
-      is: "numberOfDropSetsFlag",
-      then: Yup.number()
-        .positive()
-        .min(1)
-        .required("Must enter drop set number"),
-    }),
-  });
+  // const validationSchema = Yup.object().shape({
+  //   workoutName: Yup.string().required(serviceError.required),
+  //   numberOfSets: Yup.number()
+  //     .min(1, "The minimum amount is one")
+  //     .required(serviceError.required),
+  //   targetedMuscle: Yup.string().required(serviceError.required),
+  //   specialSetFlag: Yup.string(),
+  //   superSetWorkoutName: Yup.string().when("specialSetFlag", {
+  //     is: "superSetWorkoutNameFlag",
+  //     then: Yup.string().required("Must enter super set name"),
+  //   }),
+  //   numberOfDropSets: Yup.number().when("specialSetFlag", {
+  //     is: "numberOfDropSetsFlag",
+  //     then: Yup.number()
+  //       .positive()
+  //       .min(1)
+  //       .required("Must enter drop set number"),
+  //   }),
+  // });
 
   const {
     values,
@@ -243,8 +238,10 @@ const AddWorkout = (props) => {
         })
       ).then((_) => props.onHide());
     },
-    // validate: addWorkoutValidateFn,
-    validationSchema,
+    validationSchema: workoutValidationSchema(
+      { key: "specialSetFlag", value: "superSetWorkoutNameFlag" },
+      { key: "specialSetFlag", value: "numberOfDropSetsFlag" }
+    ),
   });
 
   // MAIN

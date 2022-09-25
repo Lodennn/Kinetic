@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { forwardRef } from "react";
 import WorkoutDataItem from "../../core-ui/WorkoutDataItem/WorkoutDataItem";
 import { renderErrorMessage } from "../../helpers/form";
@@ -15,6 +16,11 @@ const Dropset = forwardRef((props, ref) => {
     className,
   } = props;
 
+  console.log("dropSetNumOfSets: ", dropSetNumOfSets);
+
+  // editing purpose
+  const fixedDropsetNumberOfSets = useRef(dropSetNumOfSets.length);
+
   return (
     <div className="set-type__form--drop" ref={ref}>
       <div>
@@ -26,8 +32,8 @@ const Dropset = forwardRef((props, ref) => {
                 type="number"
                 name="numberOfDropSets"
                 className={`kinetic-input-1-digit kinetic-input ${className}`}
-                defaultValue={0}
-                min={0}
+                defaultValue={toUse === "edit" ? fixedDropsetNumberOfSets.current : 0}
+                min={toUse === "edit" ? fixedDropsetNumberOfSets.current : 0}
                 onChange={onChangeNumberOfDropSet}
               />
               <p className="error-message">

@@ -26,6 +26,7 @@ const Superset = forwardRef((props, ref) => {
               name="superSetWorkoutName"
               className={`form-control kinetic-input kinetic-input--white mb-lg ${className}`}
               placeholder="Workout Name"
+              value={superSetWorkoutName}
               onChange={onChangeWorkoutName}
             />
             <p className="error-message">

@@ -1,4 +1,4 @@
-export const addWorkoutSetsValidation = (formEl) => {
+export const addWorkoutSetsValidation = (formEl, preValidation) => {
   let validator = {};
   let isValid = [];
 

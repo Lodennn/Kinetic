@@ -128,7 +128,9 @@ const WorkoutsPage = () => {
         <Modal onHide={hideEditWorkoutModalHandler} modalToUse="read">
           <WorkoutDetails
             workoutDetails={editWorkoutDetails}
+            lastWorkouts={lastWorkouts}
             isEditing={true}
+            onHide={hideEditWorkoutModalHandler}
           />
         </Modal>
       )}
