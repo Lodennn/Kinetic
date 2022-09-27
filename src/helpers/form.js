@@ -16,6 +16,13 @@ export const uncheckAll = (formEl) => {
   });
 };
 
+export const checkFilledSets = (formEl) => {
+  //prettier-ignore
+  // const allSetsCheckboxes = Array.from(formEl.querySelectorAll(`input[type='checkbox']`));
+  
+  // allSetsCheckboxes.slice(0, )
+}
+
 export const renderErrorClass = (errorData, fieldKey) => {
   //prettier-ignore
   return `${errorData.errors[fieldKey] && errorData.touched[fieldKey] && "input-error"}`;

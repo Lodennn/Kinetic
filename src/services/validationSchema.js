@@ -5,8 +5,8 @@ export const workoutValidationSchema = (
   superValidCondition,
   dropValidCondition
 ) => {
-  console.log("superValidCondition: ", superValidCondition);
-  console.log("dropValidCondition: ", dropValidCondition);
+  // console.log("superValidCondition: ", superValidCondition);
+  // console.log("dropValidCondition: ", dropValidCondition);
   return Yup.object().shape({
     workoutName: Yup.string().required(serviceError.required),
     numberOfSets: Yup.number()

@@ -14,6 +14,7 @@ const Superset = forwardRef((props, ref) => {
     onChangeWorkoutName,
     errors,
     className,
+    superSetNumOfSets
   } = props;
 
   return (
@@ -49,6 +50,7 @@ const Superset = forwardRef((props, ref) => {
             <AddSet
               id={idx}
               key={idx}
+              disabled={toUse === 'edit' ? false : !(idx <= superSetNumOfSets.filledSets)}
               reps={set.reps}
               weight={set.weight}
               weightUnit={set.weightUnit}

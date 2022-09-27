@@ -7,6 +7,7 @@ import AddSet from "../AddSet/AddSet";
 const Dropset = forwardRef((props, ref) => {
   const {
     dropSetNumOfSets,
+    sets,
     onChangeNumberOfDropSet,
     showModalForDropSets,
     totalNumberOfWeight,
@@ -16,10 +17,8 @@ const Dropset = forwardRef((props, ref) => {
     className,
   } = props;
 
-  console.log("dropSetNumOfSets: ", dropSetNumOfSets);
-
   // editing purpose
-  const fixedDropsetNumberOfSets = useRef(dropSetNumOfSets.length);
+  const fixedDropsetNumberOfSets = useRef(sets.length);
 
   return (
     <div className="set-type__form--drop" ref={ref}>
@@ -42,16 +41,17 @@ const Dropset = forwardRef((props, ref) => {
             </>
           ) : (
             <div className="kinetic-input-1-digit kinetic-input">
-              {dropSetNumOfSets.length}
+              {sets.length}
             </div>
           )}
         </div>
         <div style={{ display: "flex", gap: "3rem" }}>
-          {dropSetNumOfSets.map((set, idx) => {
+          {sets.map((set, idx) => {
             return (
               <AddSet
                 id={idx}
                 key={idx}
+                disabled={toUse === 'edit' ? false : !(idx <= dropSetNumOfSets.filledSets)}
                 reps={set.reps}
                 weight={set.weight}
                 weightUnit={set.weightUnit}

@@ -124,7 +124,7 @@ const AddWorkout = (props) => {
         }),
       }));
     }
-  }, [activeSetsName, numOfSets]);
+  }, [activeSetsName]);
 
   // const validationSchema = Yup.object().shape({
   //   workoutName: Yup.string().required(serviceError.required),
@@ -249,19 +249,91 @@ const AddWorkout = (props) => {
     setTargetedMuscle(muscle);
   }, []);
 
+  useEffect(() => {
+    // console.log('numOfSets: ', numOfSets, superSetNumOfSets, dropSetNumOfSets);
+    // console.log('numOfSets CHANGE: ', numOfSets.sets.filter(set => !!set.weight).length);
+    // console.log('superSetNumOfSets CHANGE: ', superSetNumOfSets.sets.filter(set => !!set.weight).length);
+    // console.log('dropSetNumOfSets CHANGE: ', dropSetNumOfSets.sets.filter(set => !!set.weight).length);
+    setNumOfSets(prevState => ({...prevState, filledSets: numOfSets.sets.filter(set => !!set.weight).length}));
+    // console.log('activeSetsName: ', activeSetsName);
+    if(activeSetsName === 'Superset') {
+      setSuperSetNumOfSets(prevState => ({...prevState, filledSets: superSetNumOfSets.sets.filter(set => !!set.weight).length}));
+    }
+    if(activeSetsName === 'Dropset') {
+      setDropSetNumOfSets(prevState => ({...prevState, filledSets: dropSetNumOfSets.sets.filter(set => !!set.weight).length}));
+    }
+  }, [activeSetsName, showModal]);
+
   // MAIN
   const onChangeNumberOfSets = useCallback((event) => {
-    if (+event.target.value < 0) return;
-    uncheckAll(addWorkoutFormRef.current);
+    const value = +event.target.value;
+    if (value < 0) return;
+    // uncheckAll(addWorkoutFormRef.current);
     handleChange(event);
-    setNumOfSets((prevState) => ({
-      ...prevState,
-      sets: Array(+event.target.value).fill({
-        weight: "",
-        reps: "",
-        weightUnit: weightUnitRef.current,
-      }),
-    }));
+    setNumOfSets((prevState) => {
+      const filledSetsNumber = prevState.sets.filter(set => !!set.weight).length;
+
+      if(!!!filledSetsNumber && value >= filledSetsNumber) {
+        prevState.sets = Array(value).fill({
+          weight: "",
+          reps: "",
+          weightUnit: weightUnitRef.current,
+        });
+      }
+
+      if(!!filledSetsNumber && value >= filledSetsNumber) {
+        prevState.sets = [...prevState.sets.slice(0, filledSetsNumber), ...Array(value-filledSetsNumber).fill({
+          weight: "",
+          reps: "",
+          weightUnit: weightUnitRef.current,
+        })];
+      }
+
+      if(!!filledSetsNumber && value < filledSetsNumber) {
+        prevState.sets.pop();
+      }
+
+      return {
+        ...prevState,
+        sets: prevState.sets,
+      }
+    });
+    setSuperSetNumOfSets((prevState) => {
+      const filledSetsNumber = prevState.sets.filter(set => !!set.weight).length;
+      
+      if(!!!filledSetsNumber && value >= filledSetsNumber) {
+        prevState.sets = Array(value).fill({
+          weight: "",
+          reps: "",
+          weightUnit: weightUnitRef.current,
+        });
+      }
+
+      if(!!filledSetsNumber && value >= filledSetsNumber) {
+        prevState.sets = [...prevState.sets.slice(0, filledSetsNumber), ...Array(value-filledSetsNumber).fill({
+          weight: "",
+          reps: "",
+          weightUnit: weightUnitRef.current,
+        })];
+      }
+
+      if(!!filledSetsNumber && value < filledSetsNumber) {
+        prevState.sets.pop();
+      }
+
+      return {
+        ...prevState,
+        sets: prevState.sets,
+      }
+    })
+    // setSuperSetNumOfSets((prevState) => ({
+    //   ...prevState,
+    //   sets: Array(value).fill({
+    //     weight: "",
+    //     reps: "",
+    //     weightUnit: weightUnitRef.current,
+    //   }),
+    // }));
   }, []);
 
   // MAIN
@@ -373,6 +445,7 @@ const AddWorkout = (props) => {
       setSuperSetNumOfSets(defaultSetsValue);
     }
   };
+
 
   // SET TYPE PART
   const showModalForSuperSets = (data) => {
@@ -507,6 +580,7 @@ const AddWorkout = (props) => {
                       <AddSet
                         id={idx}
                         key={idx}
+                        disabled={!(idx <= numOfSets.filledSets)}
                         reps={set.reps}
                         weight={set.weight}
                         weightUnit={weightUnitRef.current}
@@ -516,6 +590,7 @@ const AddWorkout = (props) => {
                     );
                   })}
                 </div>
+                <p>Please add sets in order to keep your data in safe.. {':)'}</p>
               </div>
             </div>
           </div>
@@ -612,6 +687,7 @@ const AddWorkout = (props) => {
                   {activeSetsName === "Superset" ? (
                     <SupersetForm
                       ref={addWorkoutSuperFormRef}
+                      superSetNumOfSets={superSetNumOfSets}
                       numOfSets={numOfSets.sets.length}
                       sets={superSetNumOfSets.sets}
                       showModalForSuperSets={showModalForSuperSets}
@@ -625,8 +701,9 @@ const AddWorkout = (props) => {
                   ) : (
                     <DropsetForm
                       ref={addWorkoutDropFormRef}
+                      dropSetNumOfSets={dropSetNumOfSets}
                       onChangeNumberOfDropSet={onChangeNumberOfDropSet}
-                      dropSetNumOfSets={dropSetNumOfSets.sets}
+                      sets={dropSetNumOfSets.sets}
                       showModalForDropSets={showModalForDropSets}
                       errors={errors}
                       className={renderErrorClass(

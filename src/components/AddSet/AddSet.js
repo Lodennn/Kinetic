@@ -2,7 +2,7 @@ import React, { Fragment, useRef } from "react";
 import classes from "./AddSet.module.scss";
 
 const AddSet = (props) => {
-  const { showModalHandler, reps, id, weight, weightUnit, modifier, onChange } =
+  const { showModalHandler, reps, id, weight, weightUnit, modifier, onChange, disabled } =
     props;
 
   const randomSetCheckboxId = useRef(Math.floor(Math.random() * (100000 + id)));
@@ -11,6 +11,7 @@ const AddSet = (props) => {
     <div
       className={`${classes.sets} ${classes[`sets--${modifier}`]}`}
       onClick={() => {
+        !disabled &&
         showModalHandler &&
           showModalHandler({
             setId: id,

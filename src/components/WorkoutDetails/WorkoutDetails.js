@@ -111,6 +111,7 @@ const WorkoutDetails = (props) => {
   }, [hasSuperset, hasDropset]);
 
   useEffect(() => {
+    console.log('useEffect');
     if (editWorkoutFormRef.current) {
       let numberOfExistingSets = 0;
       const checkboxes = Array.from(
@@ -120,6 +121,7 @@ const WorkoutDetails = (props) => {
       if (hasSuperset) {
         numberOfExistingSets = numberOfSets * 2;
       }
+
       if (hasDropset) {
         numberOfExistingSets =
           numberOfSets + workoutDetailsDropsetNumberOfSets;
@@ -386,6 +388,7 @@ const WorkoutDetails = (props) => {
                   {activeSetsName === "Superset" ? (
                     <SupersetForm
                       ref={addWorkoutSuperFormRef}
+                      superSetNumOfSets={superSetNumOfSets}
                       totalNumberOfWeight={superSet.totalNumberOfWeight}
                       totalNumberOfReps={superSet.totalNumberOfReps}
                       superSetWorkoutName={values.superSetWorkoutName}
@@ -397,7 +400,8 @@ const WorkoutDetails = (props) => {
                     />
                   ) : (
                     <DropsetForm
-                      dropSetNumOfSets={isEditing ? dropSetNumOfSets.sets : dropSet.sets}
+                      dropSetNumOfSets={dropSetNumOfSets}
+                      sets={isEditing ? dropSetNumOfSets.sets : dropSet.sets}
                       onChangeNumberOfDropSet={onChangeNumberOfDropSet}
                       totalNumberOfWeight={dropSet.totalNumberOfWeight}
                       totalNumberOfReps={dropSet.totalNumberOfReps}
