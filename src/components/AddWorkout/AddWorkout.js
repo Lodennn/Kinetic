@@ -408,6 +408,7 @@ const AddWorkout = (props) => {
                   <h4 className="title-4 text-uppercase">Num of sets: </h4>
                   <input
                     type="number"
+                    step="any"
                     name="numberOfSets"
                     className={`kinetic-input-1-digit kinetic-input ${renderErrorClass(
                       { errors, touched },

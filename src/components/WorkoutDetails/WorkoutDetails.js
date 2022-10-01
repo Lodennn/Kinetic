@@ -341,6 +341,7 @@ const WorkoutDetails = (props) => {
                     <div className={`form-group-flex`}>
                       <input
                         type="number"
+                        step="any"
                         name="numberOfSets"
                         className={`kinetic-input-1-digit kinetic-input`}
                         defaultValue={numberOfSets}

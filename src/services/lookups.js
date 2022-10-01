@@ -4,6 +4,7 @@ export const targetedMuscleLookup = [
   "Arms",
   "Shoulders",
   "Legs",
+  "Cardio",
 ];
 
 export const yesterday = new Date(

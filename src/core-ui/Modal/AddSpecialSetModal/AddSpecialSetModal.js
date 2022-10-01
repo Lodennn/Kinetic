@@ -98,10 +98,11 @@ const AddSpecialSetModal = (props) => {
                 lbs
               </li>
             </ul>
-            <div className={`form-group-flex mb-md`}>
+            <div className={`form-group-flex mb-md mt-md`}>
               <h6 className="title-5 text-uppercase">Num of reps: </h6>
               <input
                 type="number"
+                step="any"
                 name="reps"
                 className={`kinetic-input-1-digit kinetic-input ${renderErrorClass(
                   { errors, touched },
@@ -122,6 +123,7 @@ const AddSpecialSetModal = (props) => {
               <h6 className="title-5 text-uppercase">Weight: </h6>
               <input
                 type="number"
+                step="any"
                 name="weight"
                 className={`kinetic-input-1-digit kinetic-input ${renderErrorClass(
                   { errors, touched },
@@ -138,7 +140,7 @@ const AddSpecialSetModal = (props) => {
             <p className="error-message">
               {renderErrorMessage(errors, "weight")}
             </p>
-            <div className="flex-cta-wrapper justify-end mt-xs">
+            <div className="flex-cta-wrapper justify-end mt-sm">
               <SecondaryButton
                 onClick={props.onHide}
                 type="button"

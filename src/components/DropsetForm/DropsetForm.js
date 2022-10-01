@@ -28,6 +28,7 @@ const Dropset = forwardRef((props, ref) => {
           <>
             <input
               type="number"
+              step="any"
               name="numberOfDropSets"
               className={`kinetic-input-1-digit kinetic-input-1-digit--white kinetic-input ${className}`}
               defaultValue={

@@ -8,6 +8,8 @@ const WorkoutBadge = (props) => {
   let RenderedBadge = null;
   let isRenderAllowed = true;
 
+  console.log("props.type: ", props.type);
+
   switch (props.type) {
     case "up":
       RenderedBadge = UpBadge;
@@ -21,22 +23,22 @@ const WorkoutBadge = (props) => {
     case "drop":
       RenderedBadge = DropSetBadge;
       break;
-    case "fixed":
-      RenderedBadge = SuperSetBadge;
-      break;
+    // case "fixed":
+    //   RenderedBadge = null;
+    //   break;
     default:
       RenderedBadge = null;
       isRenderAllowed = false;
   }
 
-  return (
-    isRenderAllowed && (
-      <RenderedBadge
-        className={`${classes.badge} ${classes[`badge--${props.type}`]} ${
-          classes[`badge--${props.size}`]
-        } ${classes[`badge--${props.color}`]}`}
-      />
-    )
+  return isRenderAllowed && props.type !== "fixed" ? (
+    <RenderedBadge
+      className={`${classes.badge} ${classes[`badge--${props.type}`]} ${
+        classes[`badge--${props.size}`]
+      } ${classes[`badge--${props.color}`]}`}
+    />
+  ) : (
+    <div></div>
   );
 };
 

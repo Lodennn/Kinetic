@@ -89,6 +89,8 @@ const WorkoutItem = (props) => {
       progressStateType = "down";
     }
 
+    console.log("progressStateType: ", progressStateType);
+
     return (
       <li className={classes["workout-item__header-badge"]}>
         <WorkoutBadge type={progressStateType} />
