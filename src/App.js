@@ -11,7 +11,6 @@ function App() {
   const { isLoggedIn } = useSelector((state) => state.auth);
   return (
     <div className="App">
-      <Navigation />
       <main>
         <Routes>
           <Route element={<PrivateRoutes />}>

@@ -41,7 +41,6 @@ export const isLengthGreaterThan6Letters = (value) => {
 };
 
 export const isRequried = (value) => {
-  console.log("typeof value: ", typeof value);
   if (typeof value === "string") {
     return value.length > 0 || !!value;
   }

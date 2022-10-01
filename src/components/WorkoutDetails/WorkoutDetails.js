@@ -27,22 +27,32 @@ import useCrudWorkouts from "../../hooks/CRUDWorkouts";
 import Editworkout from "../EditWorkout/EditWorkout";
 import { useFormik } from "formik";
 import { workoutValidationSchema } from "../../services/validationSchema";
-import { onSubmitCrudWorkoutForm, renderErrorClass, renderErrorMessage } from "../../helpers/form";
+import {
+  onSubmitCrudWorkoutForm,
+  renderErrorClass,
+  renderErrorMessage,
+} from "../../helpers/form";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addWorkoutAction } from "../../store/workouts/workouts-slice";
+import { updateWorkoutAction } from "../../store/workouts/workouts-slice";
 import { useEffect } from "react";
 import serviceError from "../../services/errors";
 // import useAddWorkoutValidations from "../../hooks/useAddWorkoutValidations";
 import * as Yup from "yup";
-import { controlValue, decreaseSetsNumber, increaseSetsNumber } from "../../helpers/workouts";
+import {
+  controlValue,
+  decreaseSetsNumber,
+  increaseSetsNumber,
+} from "../../helpers/workouts";
+import SmartSearch from "../../core-ui/SmartSearch/SmartSearch";
+import SecondaryButton from "../../core-ui/Buttons/SecondaryButton/SecondaryButton";
+import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
 
 const WorkoutDetails = (props) => {
-  
-    const { user } = useSelector((state) => state.auth);
-    const dispatch = useDispatch();
-  
-    const params = useParams();
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const params = useParams();
 
   const {
     id,
@@ -54,13 +64,15 @@ const WorkoutDetails = (props) => {
     totalNumberOfWeight,
     totalNumberOfReps,
     hasNote,
-    onHide,
   } = props.workoutDetails;
 
-  const {isEditing} = props;
+  const { isEditing, onHide } = props;
 
-  const workoutDetailsSupersetWorkoutName = props.workoutDetails.superSet.workoutName;
-  const workoutDetailsDropsetNumberOfSets = props.workoutDetails.dropSet.numberOfSets;
+  const workoutDetailsSupersetWorkoutName =
+    props.workoutDetails.superSet.workoutName;
+  const workoutDetailsDropsetNumberOfSets =
+    props.workoutDetails.dropSet.numberOfSets;
+
   const hasSuperset = !!workoutDetailsSupersetWorkoutName;
   const hasDropset = !!workoutDetailsDropsetNumberOfSets;
 
@@ -70,7 +82,8 @@ const WorkoutDetails = (props) => {
 
   let Component = isEditing ? Editworkout : "div";
 
-  
+  const { isLoading, addWorkoutForm } = useSelector((state) => state.workouts);
+
   const {
     data: editData,
     showModal: editShowModal,
@@ -93,7 +106,13 @@ const WorkoutDetails = (props) => {
     showModalForSuperSets,
     onChangeUserNumberOfReps,
     onChangeUserNumberOfWeight,
-  } = useCrudWorkouts(sets, superSet.sets, dropSet.sets, editData, editShowModalHandler);
+  } = useCrudWorkouts(
+    sets,
+    superSet.sets,
+    dropSet.sets,
+    editData,
+    editShowModalHandler
+  );
 
   // '';..;''
   const { data, showModal, showModalHandler, hideModalHandler } = useReadData(); // SECONDARY MODAL
@@ -111,9 +130,8 @@ const WorkoutDetails = (props) => {
   }, [hasSuperset, hasDropset]);
 
   useEffect(() => {
-    console.log('useEffect');
     if (editWorkoutFormRef.current) {
-      let numberOfExistingSets = 0;
+      let numberOfExistingSets = numberOfSets;
       const checkboxes = Array.from(
         editWorkoutFormRef.current.querySelectorAll('input[type="checkbox"]')
       );
@@ -123,19 +141,19 @@ const WorkoutDetails = (props) => {
       }
 
       if (hasDropset) {
-        numberOfExistingSets =
-          numberOfSets + workoutDetailsDropsetNumberOfSets;
+        numberOfExistingSets = numberOfSets + workoutDetailsDropsetNumberOfSets;
       }
+
       checkboxes
         .slice(0, numberOfExistingSets)
         .forEach((checkbox) => (checkbox.dataset.valid = true));
     }
   }, []);
 
-
   // editing functions
   const onEditSets = (event) => {
-   const value = controlValue(event, numberOfSets);
+    handleChange(event);
+    const value = controlValue(event, numberOfSets);
 
     if (value > returnedSets.sets.length) {
       setReturnedSets(increaseSetsNumber);
@@ -144,13 +162,16 @@ const WorkoutDetails = (props) => {
       }
     }
     if (value < returnedSets.sets.length) {
-      setReturnedSets((prevState) => decreaseSetsNumber(prevState)(value, returnedSets, numberOfSets));
+      setReturnedSets((prevState) =>
+        decreaseSetsNumber(prevState)(value, returnedSets, numberOfSets)
+      );
       if (hasSuperset) {
-        setSuperSetNumOfSets((prevState) => decreaseSetsNumber(prevState)(value, superSetNumOfSets, numberOfSets));
+        setSuperSetNumOfSets((prevState) =>
+          decreaseSetsNumber(prevState)(value, superSetNumOfSets, numberOfSets)
+        );
       }
     }
   };
-
 
   const {
     values,
@@ -173,21 +194,19 @@ const WorkoutDetails = (props) => {
         {
           values,
           numOfSets: returnedSets,
-          activeSetsName: hasSuperset ? "Superset" : "Dropset",
-          //x
+          activeSetsName: hasSuperset
+            ? "Superset"
+            : hasDropset
+            ? "Dropset"
+            : "",
           superSetNumOfSets: superSetNumOfSets,
-          //x
           dropSetNumOfSets: dropSetNumOfSets,
         }
       );
       if (isValid) {
-        console.log("EDIT submittedData: ", submittedData);
-        // dispatch(
-        //   addWorkoutAction({
-        //     collection: "workouts",
-        //     postData: submittedData,
-        //   })
-        // ).then((_) => onHide());
+        dispatch(updateWorkoutAction({ ...submittedData, id })).then((_) =>
+          onHide()
+        );
       } else {
         console.log("NOT SUBMITTED");
       }
@@ -215,14 +234,20 @@ const WorkoutDetails = (props) => {
   });
 
   const onChangeNumberOfDropSet = (event) => {
-    const value = controlValue(event, workoutDetailsDropsetNumberOfSets)
+    const value = controlValue(event, workoutDetailsDropsetNumberOfSets);
 
     if (value > workoutDetailsDropsetNumberOfSets) {
       setDropSetNumOfSets(increaseSetsNumber);
     }
 
     if (value < dropSetNumOfSets.sets.length) {
-      setDropSetNumOfSets(prevState => decreaseSetsNumber(prevState)(value, dropSetNumOfSets, workoutDetailsDropsetNumberOfSets));
+      setDropSetNumOfSets((prevState) =>
+        decreaseSetsNumber(prevState)(
+          value,
+          dropSetNumOfSets,
+          workoutDetailsDropsetNumberOfSets
+        )
+      );
     }
   };
 
@@ -253,6 +278,7 @@ const WorkoutDetails = (props) => {
         <div className="p-md">
           <div className={"work-details"}>
             <button
+              type="button"
               className="work-details__add-note svg--white svg--sm"
               onClick={showModalHandler.bind(null, props.workoutDetails)}
             >
@@ -261,13 +287,21 @@ const WorkoutDetails = (props) => {
             <div className="form-group mb-xxg">
               {isEditing ? (
                 <div className="form-group mb-xxg">
-                  <input
-                    type="text"
-                    className={`form-control kinetic-input `}
-                    placeholder="Workout Name"
-                    name="workoutName"
-                    value={values.workoutName}
-                    onChange={handleChange}
+                  <SmartSearch
+                    input={{
+                      type: "text",
+                      className: `kinetic-input ${renderErrorClass(
+                        { errors, touched },
+                        "workoutName"
+                      )}`,
+                      placeholder: "Workout Name",
+                      name: "workoutName",
+                      value: values.workoutName,
+                      onChange: handleChange,
+                      onBlur: handleBlur,
+                    }}
+                    setFieldValue={setFieldValue}
+                    data={props.allDayWorkouts}
                   />
                   <p className="error-message">
                     {renderErrorMessage(errors, "workoutName")}
@@ -325,7 +359,13 @@ const WorkoutDetails = (props) => {
                   </span>
                 )}
               </div>
-              <div style={{ display: "flex", gap: "3rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  columnGap: "3rem",
+                  flexWrap: "wrap",
+                }}
+              >
                 {returnedSets.sets.map((set, idx) => {
                   return (
                     <AddSet
@@ -351,7 +391,21 @@ const WorkoutDetails = (props) => {
               )}
             </div>
           </div>
-          {isEditing && <button type="submit">Edit</button>}
+          {isEditing && !hasSuperset && !hasDropset && (
+            <div className="flex-cta-wrapper">
+              <SecondaryButton
+                onClick={props.onHide}
+                type="button"
+                variant="danger"
+                disabled={isLoading}
+              >
+                {isLoading ? <LoadingSpinner size={"sm"} /> : "Cancel"}
+              </SecondaryButton>
+              <SecondaryButton type="submit" disabled={isLoading}>
+                {isLoading ? <LoadingSpinner size={"sm"} /> : "Update"}
+              </SecondaryButton>
+            </div>
+          )}
         </div>
         <hr />
         {isSpecialWorkout && (
@@ -382,9 +436,10 @@ const WorkoutDetails = (props) => {
                   </div>
                 </div>
               </header>
+
               {/* SPECIAL SET FORM */}
-              <section>
-                <div className="set-type__form">
+              <section className="">
+                <div className="set-type__form p-md">
                   {activeSetsName === "Superset" ? (
                     <SupersetForm
                       ref={addWorkoutSuperFormRef}
@@ -397,6 +452,9 @@ const WorkoutDetails = (props) => {
                       toUse={isEditing ? "edit" : "read"}
                       errors={errors}
                       onChangeWorkoutName={handleChange}
+                      onBlur={handleBlur}
+                      setFieldValue={setFieldValue}
+                      allDayWorkouts={props.allDayWorkouts}
                     />
                   ) : (
                     <DropsetForm
@@ -409,6 +467,35 @@ const WorkoutDetails = (props) => {
                       errors={errors}
                       toUse={isEditing ? "edit" : "read"}
                     />
+                  )}
+                  {isEditing && (hasSuperset || hasDropset) && (
+                    <div className="mt-xg">
+                      <hr />
+                      <div className="flex-cta-wrapper justify-end mt-xs">
+                        <SecondaryButton
+                          onClick={props.onHide}
+                          variant="secondary"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <LoadingSpinner size={"sm"} />
+                          ) : (
+                            "Cancel"
+                          )}
+                        </SecondaryButton>
+                        <SecondaryButton
+                          type="submit"
+                          variant="secondary"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <LoadingSpinner size={"sm"} />
+                          ) : (
+                            "Update"
+                          )}
+                        </SecondaryButton>
+                      </div>
+                    </div>
                   )}
                 </div>
               </section>

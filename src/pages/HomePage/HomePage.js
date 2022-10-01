@@ -19,6 +19,7 @@ import programImgeBackground5 from "./../../assets/images/program-bg-5.png";
 
 import classes from "./HomePagae.module.scss";
 import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
+import Navigation from "../../components/Layouts/Navigation/Navigation";
 
 // const programData = [
 //   {
@@ -59,24 +60,27 @@ const HomePage = () => {
   }, [dispatch]);
 
   return (
-    <div>
-      <PageIntro subTitle="Select Your" mainTitle="Program" />
-      <div className="container">
-        <div className={`section`}>
-          {isLoading && <LoadingSpinner />}
-          {!isLoading &&
-            programsData?.length !== 0 &&
-            programsData.map((program, idx) => (
-              <Program
-                key={program.id}
-                id={program.id}
-                programName={program.programName}
-                // programImage={program.programImage}
-              />
-            ))}
+    <>
+      <Navigation />
+      <div>
+        <PageIntro subTitle="Select Your" mainTitle="Program" />
+        <div className="container">
+          <div className={`section`}>
+            {isLoading && <LoadingSpinner />}
+            {!isLoading &&
+              programsData?.length !== 0 &&
+              programsData.map((program, idx) => (
+                <Program
+                  key={program.id}
+                  id={program.id}
+                  programName={program.programName}
+                  // programImage={program.programImage}
+                />
+              ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

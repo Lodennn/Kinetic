@@ -65,6 +65,16 @@ export const postDocument = async (data) => {
   }
 };
 
+export const updateDocument = async (updatedData, config) => {
+  try {
+    const documentRef = doc(db, config.collectionName, config.documentId);
+
+    await updateDoc(documentRef, updatedData);
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const updateDocumentField = async (data) => {
   try {
     const docId = doc(db, data.collection, data.docId);
@@ -102,9 +112,7 @@ export const userSignup = async (data) => {
           collection: "users",
           id: userData.id,
           postData: userData,
-        })
-          .then((data) => console.log("postDocumentWithId Data: ", data))
-          .catch((err) => console.error(err));
+        }).catch((err) => console.error(err));
         return userData;
       });
 
@@ -152,7 +160,6 @@ export const userLogin = async (data) => {
 
 export const deleteDocument = async (data) => {
   try {
-    console.log("delete data: ", data);
     await deleteDoc(doc(db, data.collectionName, data.documentId));
   } catch (err) {
     throw err;
@@ -168,7 +175,7 @@ const postDocumentWithId = async (data) => {
   }
 };
 
-const getDocumentWithId = async (data) => {
+export const getDocumentWithId = async (data) => {
   try {
     const docRef = doc(db, data.collection, data.id);
     const docSnap = await getDoc(docRef);

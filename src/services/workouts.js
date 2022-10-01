@@ -83,8 +83,8 @@ export const getWorkoutByDate = (workouts, filterByThisDate) => {
 };
 
 export const filterWorkoutByName = (workouts, workoutName) => {
-  return workouts.filter((workout) => workout.workoutName === workoutName)[0];
+  return workouts.find((workout) => workout.workoutName === workoutName);
 };
 
 const calculateTheTotalVolumeOfWorkout = (workoutSets) =>
-  workoutSets.reduce((acc, cur) => acc + cur.weight * cur.reps, 0);
+  workoutSets.reduce((acc, cur) => acc + +cur.weight * +cur.reps, 0);

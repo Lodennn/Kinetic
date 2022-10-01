@@ -20,7 +20,7 @@ export const userSignupAction = createAsyncThunk(
   "auth/signup",
   async (payload, { dispatch }) => {
     try {
-      await userSignup(payload).then((data) => {
+      const response = await userSignup(payload).then((data) => {
         const userData = {
           id: data.id,
           email: payload.email,
@@ -31,9 +31,12 @@ export const userSignupAction = createAsyncThunk(
 
         dispatch(authActions.userSignup(userData));
         if (!!!data.error) setLocalStorage("user", userData);
+        else return data;
       });
+
+      return response;
     } catch (err) {
-      console.error(err);
+      console.error("SIGNUP ERROR: ", err);
     }
   }
 );

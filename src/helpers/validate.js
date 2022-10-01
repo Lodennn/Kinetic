@@ -3,13 +3,6 @@ import { addWorkoutSetsValidation, isRequried } from "../services/validations";
 export const addWorkoutValidateFn = (values) => {
   const errors = {};
 
-  console.log(
-    "values: ",
-    values,
-    values.numberOfDropSets,
-    values.superSetWorkoutName
-  );
-
   if (!isRequried(values.workoutName)) {
     errors.workoutName = "This field is required";
   }

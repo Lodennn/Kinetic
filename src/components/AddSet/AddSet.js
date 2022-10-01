@@ -10,6 +10,7 @@ const AddSet = (props) => {
   return (
     <div
       className={`${classes.sets} ${classes[`sets--${modifier}`]}`}
+      style={{opacity: disabled ? '.5' : '1'}}
       onClick={() => {
         !disabled &&
         showModalHandler &&

@@ -26,5 +26,11 @@
     align-items: center;
     left: 5rem;
     top: 0;
+    @media (max-width: 900px) {
+      left: 0rem;
+      border-top-left-radius: 4rem;
+      top: 2px;
+      width: 6rem;
+    }
   }
 }

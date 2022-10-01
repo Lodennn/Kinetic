@@ -25,11 +25,7 @@
 //     return errors;
 //   };
 
-//   console.log("addWorkoutForm: ", addWorkoutForm.form);
-
 //   const mainSetsValidator = addWorkoutSetsValidation(addWorkoutForm.form);
-
-//   console.log("mainSetsValidator: ", mainSetsValidator);
 
 //   return { addWorkoutValidateFn };
 // };

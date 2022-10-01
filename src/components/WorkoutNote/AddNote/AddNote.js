@@ -28,7 +28,6 @@ const AddNote = (props) => {
     },
     validationSchema,
     onSubmit(values) {
-      console.log("Submitted form addNote - ", values);
       dispatch(
         addNoteAction({
           userId: "222",

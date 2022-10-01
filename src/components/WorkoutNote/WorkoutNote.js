@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import AddNote from "./AddNote/AddNote";
 import ViewNote from "./ViewNote/ViewNote";
 
@@ -8,7 +9,7 @@ const WorkoutNote = (props) => {
   return (
     <div className="add-note p-md">
       {props.workoutDetails.hasNote ? (
-        <ViewNote onHide={props.onHide} />
+        <ViewNote workoutDetails={props.workoutDetails} onHide={props.onHide} />
       ) : (
         <AddNote workoutId={props.workoutDetails.id} onHide={props.onHide} />
       )}

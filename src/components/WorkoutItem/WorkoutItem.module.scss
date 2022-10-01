@@ -5,6 +5,10 @@
   position: relative;
   margin-bottom: 3rem;
 
+  @media (max-width: 900px) {
+    padding: 2rem 2rem;
+  }
+
   & > * {
     margin-bottom: 2.5rem;
   }
@@ -29,10 +33,17 @@
       text-transform: uppercase;
       cursor: pointer;
       display: inline-block;
+      @media (max-width: 900px) {
+        font-size: 3.5rem;
+      }
     }
   }
   &__footer {
     display: flex;
+    @media (max-width: 980px) {
+      flex-direction: column;
+      row-gap: 2rem;
+    }
   }
 
   &__info {
@@ -55,6 +66,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    @media (max-width: 900px) {
+      top: 0;
+      right: 0rem;
+      width: 50%;
+      height: 20%;
+    }
     svg {
       width: 1.4rem;
       height: 1.4rem;

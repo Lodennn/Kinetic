@@ -1,14 +1,23 @@
 import { useCallback, useRef, useState } from "react";
 import { defaultSetsValue } from "../services/lookups";
 
-const useCrudWorkouts = (sets, superSets, dropSets, workoutData, showModalHandler, toUse) => {
- 
+const useCrudWorkouts = (
+  sets,
+  superSets,
+  dropSets,
+  workoutData,
+  showModalHandler,
+  toUse
+) => {
   // editing variables
   const [superSetNumOfSets, setSuperSetNumOfSets] = useState({
     sets: superSets,
     filledSets: 0,
   });
-  const [dropSetNumOfSets, setDropSetNumOfSets] = useState({sets: dropSets, filledSets: 0});
+  const [dropSetNumOfSets, setDropSetNumOfSets] = useState({
+    sets: dropSets,
+    filledSets: 0,
+  });
   const [returnedSets, setReturnedSets] = useState({ sets, filledSets: 0 });
   const [userSetsType, setUserSetsType] = useState("");
   const userNumberOfWeight = useRef("");
@@ -58,48 +67,54 @@ const useCrudWorkouts = (sets, superSets, dropSets, workoutData, showModalHandle
     userNumberOfWeight.current = event.target.value;
   };
 
-    // SECONDARY MODAL
-    const addSetsHandler = () => {
-      if (userSetsType === "main") {
-        setReturnedSets((prevState) => {
-          prevState.sets[workoutData.setId] = {
-            weight: userNumberOfWeight.current,
-            reps: userNumberOfReps.current,
-            weightUnit: weightUnitRef.current,
-          };
-          return {
-            sets: [...prevState.sets],
-            filledSets: prevState.filledSets + 1,
-          };
-        });
-      } else if (userSetsType === "super") {
-        setSuperSetNumOfSets((prevState) => {
-          prevState.sets[workoutData.setId] = {
-            weight: userNumberOfWeight.current,
-            reps: userNumberOfReps.current,
-            weightUnit: weightUnitRef.current,
-          };
-          return {
-            sets: [...prevState.sets],
-            filledSets: prevState.filledSets + 1,
-          };
-        });
-        setDropSetNumOfSets(defaultSetsValue);
-      } else if (userSetsType === "drop") {
-        setDropSetNumOfSets((prevState) => {
-          prevState.sets[workoutData.setId] = {
-            weight: userNumberOfWeight.current,
-            reps: userNumberOfReps.current,
-            weightUnit: weightUnitRef.current,
-          };
-          return {
-            sets: [...prevState.sets],
-            filledSets: prevState.filledSets + 1,
-          };
-        });
-        setSuperSetNumOfSets(defaultSetsValue);
-      }
-    };
+  // SECONDARY MODAL
+  const addSetsHandler = () => {
+    if (userSetsType === "main") {
+      setReturnedSets((prevState) => {
+        const prevStateSetsTemp = [...prevState.sets];
+
+        prevStateSetsTemp[workoutData.setId] = {
+          weight: userNumberOfWeight.current,
+          reps: userNumberOfReps.current,
+          weightUnit: weightUnitRef.current,
+        };
+        return {
+          sets: [...prevStateSetsTemp],
+          filledSets: prevState.filledSets + 1,
+        };
+      });
+    } else if (userSetsType === "super") {
+      setSuperSetNumOfSets((prevState) => {
+        const prevStateSetsTemp = [...prevState.sets];
+
+        prevStateSetsTemp[workoutData.setId] = {
+          weight: userNumberOfWeight.current,
+          reps: userNumberOfReps.current,
+          weightUnit: weightUnitRef.current,
+        };
+        return {
+          sets: [...prevStateSetsTemp],
+          filledSets: prevState.filledSets + 1,
+        };
+      });
+      setDropSetNumOfSets(defaultSetsValue);
+    } else if (userSetsType === "drop") {
+      setDropSetNumOfSets((prevState) => {
+        const prevStateSetsTemp = [...prevState.sets];
+
+        prevStateSetsTemp[workoutData.setId] = {
+          weight: userNumberOfWeight.current,
+          reps: userNumberOfReps.current,
+          weightUnit: weightUnitRef.current,
+        };
+        return {
+          sets: [...prevStateSetsTemp],
+          filledSets: prevState.filledSets + 1,
+        };
+      });
+      setSuperSetNumOfSets(defaultSetsValue);
+    }
+  };
 
   return {
     returnedSets,

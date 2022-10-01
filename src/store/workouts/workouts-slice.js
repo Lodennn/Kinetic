@@ -7,6 +7,7 @@ import {
   getCollection,
   getWorkouts,
   postDocument,
+  updateDocument,
   updateDocumentField,
 } from "../../services/api";
 import { timestampToDate } from "../../services/dates";
@@ -30,6 +31,17 @@ export const addWorkoutAction = createAsyncThunk("workouts/addWorkout", async (d
     }
   }
 );
+
+//prettier-ignore
+export const updateWorkoutAction = createAsyncThunk('workouts/updateWorkout', async (data, {dispatch, getState}) => {
+  try {
+    await updateDocument(data, {collectionName: 'workouts', documentId: data.id}).then(returnedData => {
+      dispatch(workoutsActions.updateWorkout(data));
+    });
+  } catch(err) {
+    console.error(err);
+  }
+});
 
 //prettier-ignore
 export const deleteWorkoutAction = createAsyncThunk('workouts/deleteWorkout', async (data, {dispatch, getState}) => {
@@ -62,17 +74,42 @@ export const addNoteToWorkoutAction = createAsyncThunk(
   "workouts/addNoteToWorkout",
   async (payload, { getState, dispatch }) => {
     try {
-      const appropriatePayload = {
-        collection: "workouts",
-        docId: payload.workoutId,
-        updatedField: "hasNote",
-        updatedFieldValue: true,
-      };
-      await updateDocumentField(appropriatePayload).then((data) => {
-        dispatch(
-          workoutsActions.addNoteToWorkout({ workoutId: payload.workoutId })
-        );
-      });
+      await updateDocument(payload.updatedData, {
+        collectionName: "workouts",
+        documentId: payload.workoutId,
+      })
+        .then((_) => {
+          if (payload.action === "add") {
+            dispatch(
+              workoutsActions.addNoteToWorkout({
+                workoutId: payload.workoutId,
+                noteId: payload.updatedData.noteId,
+                addNote: true,
+              })
+            );
+          }
+          if (payload.action === "update") {
+          }
+          if (payload.action === "delete") {
+            updateDocumentField({
+              collection: "workouts",
+              docId: payload.workoutId,
+              updatedField: "noteId",
+              updatedFieldValue: null,
+            })
+              .then((_) => {
+                dispatch(
+                  workoutsActions.addNoteToWorkout({
+                    workoutId: payload.workoutId,
+                    noteId: payload.updatedData.noteId,
+                    addNote: false,
+                  })
+                );
+              })
+              .catch((err) => console.log("err UPDATING: ", err));
+          }
+        })
+        .catch((err) => console.error("addNoteToWorkout - ERROR: ", err));
     } catch (err) {
       console.error(err);
     }
@@ -98,8 +135,16 @@ const workoutsSlice = createSlice({
       );
       state.workouts[updatedWorkoutIndex] = {
         ...updatedWorkout,
-        hasNote: true,
+        noteId: action.payload.noteId,
+        hasNote: action.payload.addNote,
       };
+    },
+    updateWorkout: (state, action) => {
+      const updatedWorkoutIndex = state.workouts.findIndex(
+        (workout) => workout.id === action.payload.id
+      );
+
+      state.workouts[updatedWorkoutIndex] = action.payload;
     },
     deleteWorkout: (state, action) => {
       state.workouts = state.workouts.filter(
@@ -125,6 +170,15 @@ const workoutsSlice = createSlice({
       state.isLoading = false;
     },
     [addWorkoutAction.rejected]: (state, action) => {
+      state.error = action.error;
+    },
+    [updateWorkoutAction.pending]: (state, action) => {
+      state.isLoading = true;
+    },
+    [updateWorkoutAction.fulfilled]: (state, action) => {
+      state.isLoading = false;
+    },
+    [updateWorkoutAction.rejected]: (state, action) => {
       state.error = action.error;
     },
     [addNoteToWorkoutAction.pending]: (state, action) => {

@@ -22,6 +22,7 @@ import { getWorkoutsAction } from "../../store/workouts/workouts-slice";
 import { resetDate } from "../../services/dates";
 import LoadingSpinner from "../../core-ui/LoadingSpinner/LoadingSpinner";
 import { useState } from "react";
+import Navigation from "../../components/Layouts/Navigation/Navigation";
 
 const WorkoutsPage = () => {
   const { programId, dayId } = useParams();
@@ -35,9 +36,6 @@ const WorkoutsPage = () => {
   }, []);
 
   const { workouts, isLoading } = useSelector((state) => state.workouts);
-
-  const [addSpecialMainSetOnEditMode, setAddSpecialMainSetOnEditMode] =
-    useState(null);
 
   const availableDates = getAvailableDatesInDay(workouts, programId, dayId);
 
@@ -69,7 +67,8 @@ const WorkoutsPage = () => {
     workoutFilteredDateR.date
   );
 
-  const { showModal, showModalHandler, hideModalHandler } = useReadData();
+  const { showModal, showModalHandler, hideModalHandler } =
+    useReadData(workouts);
   const {
     data: workoutDetails,
     showModal: showWorkoutDetailsModal,
@@ -109,59 +108,67 @@ const WorkoutsPage = () => {
   };
 
   return (
-    <div>
-      <PageIntro subTitle="Create your" mainTitle="Workouts" />
+    <>
+      <Navigation />
+      <div className="page-wrapper">
+        <PageIntro subTitle="Create your" mainTitle="Workouts" />
 
-      {showModal && (
-        <Modal onHide={hideModalHandler}>
-          <AddWorkout lastWorkouts={lastWorkouts} onHide={hideModalHandler} />
-        </Modal>
-      )}
+        {showModal && (
+          <Modal onHide={hideModalHandler}>
+            <AddWorkout
+              allDayWorkouts={workouts}
+              lastWorkouts={lastWorkouts}
+              onHide={hideModalHandler}
+            />
+          </Modal>
+        )}
 
-      {showWorkoutDetailsModal && (
-        <Modal onHide={hideWorkoutDetailsModalHandler} modalToUse="read">
-          <WorkoutDetails workoutDetails={workoutDetails} />
-        </Modal>
-      )}
+        {showWorkoutDetailsModal && (
+          <Modal onHide={hideWorkoutDetailsModalHandler} modalToUse="read">
+            <WorkoutDetails workoutDetails={workoutDetails} />
+          </Modal>
+        )}
 
-      {showEditWorkoutModal && (
-        <Modal onHide={hideEditWorkoutModalHandler} modalToUse="read">
-          <WorkoutDetails
-            workoutDetails={editWorkoutDetails}
-            lastWorkouts={lastWorkouts}
-            isEditing={true}
-            onHide={hideEditWorkoutModalHandler}
+        {showEditWorkoutModal && (
+          <Modal onHide={hideEditWorkoutModalHandler} modalToUse="read">
+            <WorkoutDetails
+              allDayWorkouts={workouts}
+              workoutDetails={editWorkoutDetails}
+              lastWorkouts={lastWorkouts}
+              isEditing={true}
+              onHide={hideEditWorkoutModalHandler}
+            />
+          </Modal>
+        )}
+
+        <Fragment>
+          <WorkoutsDateSlider
+            date={workoutFilteredDateR.date}
+            dates={availableDates}
+            getPrevDate={getPrevDate}
+            getNextDate={getNextDate}
           />
-        </Modal>
-      )}
+          <div className="section container">
+            {isLoading && <LoadingSpinner />}
+            {!isLoading &&
+              filteredWorkouts.map((workout) => {
+                return (
+                  <Workout
+                    key={workout.id}
+                    {...workout}
+                    onClick={showWorkoutDetailsModalHandler}
+                    onEdit={showEditWorkoutModalHandler}
+                  />
+                );
+              })}
+          </div>
+        </Fragment>
 
-      <Fragment>
-        <WorkoutsDateSlider
-          date={workoutFilteredDateR.date}
-          dates={availableDates}
-          getPrevDate={getPrevDate}
-          getNextDate={getNextDate}
-        />
-        <div className="section container">
-          {isLoading && <LoadingSpinner />}
-          {!isLoading &&
-            filteredWorkouts.map((workout) => {
-              return (
-                <Workout
-                  key={workout.id}
-                  {...workout}
-                  onClick={showWorkoutDetailsModalHandler}
-                  onEdit={showEditWorkoutModalHandler}
-                />
-              );
-            })}
-        </div>
-      </Fragment>
-
-      {resetDate(workoutFilteredDateR.date) === resetDate(new Date()) && (
-        <FloatingCTA onClick={showModalHandler} icon={<PlusIcon />} />
-      )}
-    </div>
+        {resetDate(workoutFilteredDateR.date) === resetDate(new Date()) && (
+          <FloatingCTA onClick={showModalHandler} icon={<PlusIcon />} />
+        )}
+      </div>
+    </>
   );
 };
 

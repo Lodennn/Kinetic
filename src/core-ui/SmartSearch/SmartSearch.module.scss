@@ -1,0 +1,44 @@
+.smart-search {
+  position: relative;
+  &__result {
+    background: #fff;
+    box-shadow: 0 1px 4px #ccc;
+    padding: 2rem;
+    height: 350px;
+    overflow-y: scroll;
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+  }
+  &__list {
+    margin-bottom: 3rem;
+    font-size: 1.6rem;
+  }
+  &__category {
+    color: #aeaeae !important;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    & span:last-child {
+      width: 90%;
+      height: 2px;
+      background-color: #000;
+    }
+  }
+  &__item {
+    padding: 1rem 1.5rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    &:hover {
+      background-color: #ccc;
+      padding: 1rem 1.5rem 1rem 2.5rem;
+    }
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+  }
+}

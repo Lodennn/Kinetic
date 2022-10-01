@@ -16,12 +16,14 @@ export const uncheckAll = (formEl) => {
   });
 };
 
-export const checkFilledSets = (formEl) => {
+export const checkFilledSets = (
+  formEl
+) => {
   //prettier-ignore
   // const allSetsCheckboxes = Array.from(formEl.querySelectorAll(`input[type='checkbox']`));
   
   // allSetsCheckboxes.slice(0, )
-}
+};
 
 export const renderErrorClass = (errorData, fieldKey) => {
   //prettier-ignore
@@ -41,9 +43,10 @@ export const onSubmitCrudWorkoutForm = (
   formData
 ) => {
   const { isValid, validator } = addWorkoutSetsValidation(formRef.current);
-  console.log("isValid: ", isValid);
 
   const submittedData = {};
+
+  console.log("props: ", props);
 
   submittedData.userId = user.id;
   submittedData.dayId = params.dayId;
@@ -57,23 +60,12 @@ export const onSubmitCrudWorkoutForm = (
   submittedData.totalNumberOfWeight = calculateInfoOfSets(formData.numOfSets.sets, "weight");
   //prettier-ignore
   submittedData.totalNumberOfReps = calculateInfoOfSets(formData.numOfSets.sets, "reps");
-  submittedData.createdAt = new Date();
-  // new Date(
-  //   new Date().getFullYear(),
-  //   new Date().getMonth(),
-  //   new Date().getDate() - 1
-  // );
+  submittedData.createdAt = props?.workoutDetails?.createdAt || new Date();
 
   const typicalLastWorkout = filterWorkoutByName(
     props.lastWorkouts,
     formData.values.workoutName
   );
-  const progressStatus = checkWorkoutProgressStatus(
-    typicalLastWorkout,
-    submittedData
-  );
-
-  submittedData.progressState = progressStatus;
 
   if (formData.activeSetsName === "Superset") {
     submittedData.isSpecialWorkout = true;
@@ -103,6 +95,13 @@ export const onSubmitCrudWorkoutForm = (
     submittedData.superSet = {};
     submittedData.dropSet = {};
   }
+
+  const progressStatus = checkWorkoutProgressStatus(
+    typicalLastWorkout,
+    submittedData
+  );
+
+  submittedData.progressState = progressStatus;
 
   return { submittedData, isValid };
 };

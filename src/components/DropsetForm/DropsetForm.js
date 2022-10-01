@@ -22,44 +22,48 @@ const Dropset = forwardRef((props, ref) => {
 
   return (
     <div className="set-type__form--drop" ref={ref}>
-      <div>
-        <div className={`form-group-flex`}>
-          <h4 className="title-4">Num of sets: </h4>
-          {toUse !== "read" ? (
-            <>
-              <input
-                type="number"
-                name="numberOfDropSets"
-                className={`kinetic-input-1-digit kinetic-input ${className}`}
-                defaultValue={toUse === "edit" ? fixedDropsetNumberOfSets.current : 0}
-                min={toUse === "edit" ? fixedDropsetNumberOfSets.current : 0}
-                onChange={onChangeNumberOfDropSet}
-              />
-              <p className="error-message">
-                {renderErrorMessage(errors, "numberOfDropSets")}
-              </p>
-            </>
-          ) : (
-            <div className="kinetic-input-1-digit kinetic-input">
-              {sets.length}
-            </div>
-          )}
-        </div>
-        <div style={{ display: "flex", gap: "3rem" }}>
-          {sets.map((set, idx) => {
-            return (
-              <AddSet
-                id={idx}
-                key={idx}
-                disabled={toUse === 'edit' ? false : !(idx <= dropSetNumOfSets.filledSets)}
-                reps={set.reps}
-                weight={set.weight}
-                weightUnit={set.weightUnit}
-                showModalHandler={showModalForDropSets}
-              />
-            );
-          })}
-        </div>
+      <div className={`form-group-flex`}>
+        <h4 className="title-4">Num of sets: </h4>
+        {toUse !== "read" ? (
+          <>
+            <input
+              type="number"
+              name="numberOfDropSets"
+              className={`kinetic-input-1-digit kinetic-input-1-digit--white kinetic-input ${className}`}
+              defaultValue={
+                toUse === "edit" ? fixedDropsetNumberOfSets.current : 0
+              }
+              min={toUse === "edit" ? fixedDropsetNumberOfSets.current : 0}
+              onChange={onChangeNumberOfDropSet}
+            />
+            <p className="error-message">
+              {renderErrorMessage(errors, "numberOfDropSets")}
+            </p>
+          </>
+        ) : (
+          <div className="kinetic-input-1-digit kinetic-input">
+            {sets.length}
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: "3rem" }}>
+        {sets.map((set, idx) => {
+          return (
+            <AddSet
+              id={idx}
+              key={idx}
+              disabled={
+                toUse === "edit" || toUse === "read"
+                  ? false
+                  : !(idx <= dropSetNumOfSets.filledSets)
+              }
+              reps={set.reps}
+              weight={set.weight}
+              weightUnit={set.weightUnit}
+              showModalHandler={toUse !== "read" && showModalForDropSets}
+            />
+          );
+        })}
       </div>
 
       {toUse === "read" && (

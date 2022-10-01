@@ -22,6 +22,10 @@
 
 html {
   font-size: 62.5%;
+
+  @media (max-width: 600px) {
+    font-size: 50%;
+  }
 }
 
 body {
@@ -110,6 +114,14 @@ a {
 
 .section {
   padding: 7rem 0;
+}
+
+.title-1 {
+  font-size: 5rem;
+}
+
+.title-2 {
+  font-size: 4rem;
 }
 
 .title-3 {
@@ -272,6 +284,9 @@ a {
   text-align: center;
   font-size: 2rem;
   border-bottom: 1px solid #ccc;
+  &--white {
+    color: white;
+  }
 }
 
 .kinetic-textarea {
@@ -393,4 +408,24 @@ hr {
   margin-top: 1rem;
   color: var(--color-danger);
   font-size: 1.3rem;
+}
+
+.page-wrapper {
+  @media (max-width: 900px) {
+    padding-inline: 0.5rem;
+  }
+}
+
+.alert {
+  width: 100%;
+  padding: 2rem 1rem;
+  font-size: 1.4rem;
+  margin-block: 2rem;
+  border-width: 1px;
+  border-style: solid;
+  &--danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
 }

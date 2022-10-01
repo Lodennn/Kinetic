@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+import SmartSearch from "../../core-ui/SmartSearch/SmartSearch";
 import WorkoutDataItem from "../../core-ui/WorkoutDataItem/WorkoutDataItem";
 import { renderErrorMessage } from "../../helpers/form";
 import AddSet from "../AddSet/AddSet";
@@ -14,7 +15,10 @@ const Superset = forwardRef((props, ref) => {
     onChangeWorkoutName,
     errors,
     className,
-    superSetNumOfSets
+    superSetNumOfSets,
+    onBlur,
+    setFieldValue,
+    allDayWorkouts,
   } = props;
 
   return (
@@ -22,39 +26,48 @@ const Superset = forwardRef((props, ref) => {
       <div className="form-group">
         {toUse !== "read" ? (
           <>
-            <input
-              type="text"
-              name="superSetWorkoutName"
-              className={`form-control kinetic-input kinetic-input--white mb-lg ${className}`}
-              placeholder="Workout Name"
-              value={superSetWorkoutName}
-              onChange={onChangeWorkoutName}
+            <SmartSearch
+              input={{
+                type: "text",
+                className: `form-control kinetic-input kinetic-input--white mb-xs ${className}`,
+                placeholder: "Workout Name",
+                name: "superSetWorkoutName",
+                value: superSetWorkoutName,
+                onChange: onChangeWorkoutName,
+                onBlur: onBlur,
+              }}
+              setFieldValue={setFieldValue}
+              data={allDayWorkouts}
             />
             <p className="error-message">
               {renderErrorMessage(errors, "superSetWorkoutName")}
             </p>
           </>
         ) : (
-          <div className="form-control kinetic-input kinetic-input--white mb-lg">
+          <div className="form-control kinetic-input kinetic-input--white mb-lg title-5">
             {superSetWorkoutName}
           </div>
         )}
       </div>
       <div className={`form-group-flex mt-auto`}>
-        <h4 className="title-4 text-uppercase">Num of sets: </h4>
-        <div>{sets.length}</div>
+        <h4 className="title-5 text-uppercase">Num of sets: </h4>
+        <div className="title-1">{sets.length}</div>
       </div>
-      <div style={{ display: "flex", gap: "3rem" }}>
+      <div style={{ display: "flex", gap: "3rem", flexWrap: "wrap" }}>
         {sets.map((set, idx) => {
           return (
             <AddSet
               id={idx}
               key={idx}
-              disabled={toUse === 'edit' ? false : !(idx <= superSetNumOfSets.filledSets)}
+              disabled={
+                toUse === "edit" || toUse === "read"
+                  ? false
+                  : !(idx <= superSetNumOfSets.filledSets)
+              }
               reps={set.reps}
               weight={set.weight}
               weightUnit={set.weightUnit}
-              showModalHandler={showModalForSuperSets}
+              showModalHandler={toUse !== "read" && showModalForSuperSets}
             />
           );
         })}

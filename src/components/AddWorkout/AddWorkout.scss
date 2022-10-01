@@ -16,6 +16,10 @@
     padding: 3rem 2rem;
     height: 10rem;
     transition: height 1s ease;
+    @media (max-width: 900px) {
+      flex-direction: column;
+      gap: 5rem;
+    }
 
     &.sets-animation-active {
       height: 100%;
@@ -126,6 +130,12 @@
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
+    }
+    &--drop {
+      gap: 6rem;
+    }
+    &--super {
+      gap: 2rem;
     }
   }
   &__total-num-reps {

@@ -34,7 +34,6 @@ const AddSpecialSetModal = (props) => {
     },
     onSubmit(values) {
       if (values.reps && values.weight) {
-        console.log("VALID");
         timer = setTimeout(() => {
           props.hideModalHandler();
           props.addSetsHandler();
@@ -45,9 +44,6 @@ const AddSpecialSetModal = (props) => {
     },
     validationSchema,
   });
-
-  console.log("errors: ", errors);
-  console.log("setCheckboxId: ", setCheckboxId);
 
   useEffect(() => {
     if (isSubmitting) {
