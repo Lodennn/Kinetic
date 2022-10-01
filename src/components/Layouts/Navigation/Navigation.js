@@ -17,11 +17,11 @@ const Navigation = () => {
         <div className={`${classes["navigation__wrapper"]} flex-wrapper`}>
           <ul className={classes["navigation__links"]}>
             <li className={classes["navigation__item"]}>
-              <Link to="" className={classes["navigation__link"]}>
+              <Link to="/" className={classes["navigation__link"]}>
                 Home
               </Link>
             </li>
-            <li className={classes["navigation__item"]}>
+            {/* <li className={classes["navigation__item"]}>
               <Link to="" className={classes["navigation__link"]}>
                 Muscle
               </Link>
@@ -30,7 +30,7 @@ const Navigation = () => {
               <Link to="" className={classes["navigation__link"]}>
                 Workouts
               </Link>
-            </li>
+            </li> */}
           </ul>
           <ul className={classes["navigation__auth"]}>
             {!isLoggedIn && (

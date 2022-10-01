@@ -63,6 +63,9 @@
     font-size: 12rem;
     margin-bottom: 3rem;
     text-transform: uppercase;
+    @media (max-width: 600px) {
+      font-size: 7rem;
+    }
     span {
       line-height: 0.8;
     }
