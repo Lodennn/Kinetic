@@ -1,0 +1,27 @@
+@mixin respond($bp) {
+    @if $bp == phone {
+      @media screen and (max-width: 37.5em) {
+        @content;
+      }
+    }
+    @if $bp == tab-port {
+      @media screen and (max-width: 50em) {
+        @content;
+      }
+    }
+    @if $bp == tab-land {
+      @media screen and (max-width: 56.25em) {
+        @content;
+      }
+    }
+    @if $bp == tab-large {
+      @media screen and (max-width: 75em) {
+        @content;
+      }
+    }
+    @if $bp == big-desktop {
+      @media screen and (min-width: 112.5em) {
+        @content;
+      }
+    }
+  }
