@@ -38,10 +38,10 @@ const AddSet = (props) => {
             className="checkbox__sets set-checkbox"
             onChange={onChange || onChange}
           />
-          <span>{reps && parseInt(reps, 10)}</span>
+          <span>{reps && +reps}</span>
           {weight && (
             <div className={classes["sets__weight"]}>
-              {parseInt(weight, 10) + weightUnit}
+              {+weight + weightUnit}
             </div>
           )}
         </div>
