@@ -1,10 +1,12 @@
+@import "../../styles/Mixins.scss";
+
 .program {
   font-size: 3rem;
   position: relative;
   background: #4778e0;
   border-radius: 2rem;
   //   height: 40rem;
-
+ 
   &:first-child {
     margin-top: 8rem;
   }
@@ -63,6 +65,10 @@
     font-size: 12rem;
     margin-bottom: 3rem;
     text-transform: uppercase;
+    @include md() {
+      font-size: 6rem;
+      margin:2rem 0;
+    }
     @media (max-width: 600px) {
       font-size: 7rem;
     }
@@ -76,5 +82,8 @@
     letter-spacing: 3rem;
     margin-left: 0.7rem;
     text-transform: uppercase;
+    @include md() {
+      letter-spacing: 1rem;
+    }
   }
 }
