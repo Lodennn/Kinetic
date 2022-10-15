@@ -414,7 +414,8 @@ const AddWorkout = (props) => {
                       { errors, touched },
                       "numberOfSets"
                     )}`}
-                    defaultValue={0}
+                    // defaultValue={0}
+                    placeholder={0}
                     min={0}
                     onChange={onAddSets}
                   />

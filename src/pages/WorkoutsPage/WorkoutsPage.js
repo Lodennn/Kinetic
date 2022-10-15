@@ -10,6 +10,7 @@ import PageIntro from "../../core-ui/PageIntro/PageIntro";
 import useReadData from "../../hooks/useReadData";
 
 import { ReactComponent as PlusIcon } from "../../assets/icons/PLUS.svg";
+import emptyWorkoutsImage from '../../assets/add-workout-arrow3.jpeg';
 
 import WorkoutDetails from "../../components/WorkoutDetails/WorkoutDetails";
 import WorkoutsDateSlider from "../../components/WorkoutsDateSlider/WorkoutsDateSlider";
@@ -151,6 +152,7 @@ const WorkoutsPage = () => {
           <div className="section container">
             {isLoading && <LoadingSpinner />}
             {!isLoading &&
+            filteredWorkouts.length > 0 &&
               filteredWorkouts.map((workout) => {
                 return (
                   <Workout
@@ -161,6 +163,7 @@ const WorkoutsPage = () => {
                   />
                 );
               })}
+              {/* {filteredWorkouts.length <= 0 && <div><img src={emptyWorkoutsImage} alt='img' /></div>} */}
           </div>
         </Fragment>
 

@@ -109,7 +109,8 @@ const AddSpecialSetModal = (props) => {
                   "reps"
                 )}`}
                 min={1}
-                defaultValue={0}
+                // defaultValue={0}
+                placeholder={0}
                 onChange={(event) => {
                   handleChange(event);
                   props.onChangeUserNumberOfReps(event);
@@ -129,7 +130,8 @@ const AddSpecialSetModal = (props) => {
                   { errors, touched },
                   "weight"
                 )}`}
-                defaultValue={0}
+                // defaultValue={0}
+                placeholder={0}
                 min={1}
                 onChange={(event) => {
                   handleChange(event);

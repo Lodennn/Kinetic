@@ -48,11 +48,13 @@ export const onSubmitCrudWorkoutForm = (
 
   console.log("props: ", props);
 
+  const trimmedWorkoutname = formData.values.workoutName.trim();
+
   submittedData.userId = user.id;
   submittedData.dayId = params.dayId;
   submittedData.programId = params.programId;
   submittedData.hasNote = false;
-  submittedData.workoutName = formData.values.workoutName;
+  submittedData.workoutName = trimmedWorkoutname;
   submittedData.category = formData.values.targetedMuscle;
   submittedData.numberOfSets = formData.values.numberOfSets;
   submittedData.sets = formData.numOfSets.sets;
@@ -64,7 +66,7 @@ export const onSubmitCrudWorkoutForm = (
 
   const typicalLastWorkout = filterWorkoutByName(
     props.lastWorkouts,
-    formData.values.workoutName
+    trimmedWorkoutname
   );
 
   if (formData.activeSetsName === "Superset") {
