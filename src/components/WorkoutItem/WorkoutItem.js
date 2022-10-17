@@ -99,7 +99,10 @@ const WorkoutItem = (props) => {
   };
 
   const deleteWorkoutHandler = () => {
-    dispatch(deleteWorkoutAction({ documentId: props.id }));
+    const isDelete = window.confirm(`Are you sure, you want to delete *${displayWorkoutName()}* workout?`);
+    if(isDelete) {
+      dispatch(deleteWorkoutAction({ documentId: props.id }));
+    }
   };
 
   return (

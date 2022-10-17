@@ -33,8 +33,10 @@
       text-transform: uppercase;
       cursor: pointer;
       display: inline-block;
+      width: 75%;
       @media (max-width: 900px) {
         font-size: 3.5rem;
+        margin-top: 3rem;
       }
     }
   }
