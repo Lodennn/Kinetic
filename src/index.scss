@@ -125,6 +125,8 @@ a {
 
 .section {
   padding: 7rem 0;
+  @include grid-min-max-cols(1, 4, 30rem, 2rem, 2rem);
+  padding: 1rem 5rem;
 }
 
 .title-1 {

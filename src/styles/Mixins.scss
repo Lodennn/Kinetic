@@ -25,3 +25,21 @@
       }
     }
   }
+
+  @mixin md {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+  
+  @mixin grid-min-max-cols($min-cols, $max-cols, $cols-min-width, $grid-row-gap: 0px, $grid-column-gap: 0px) {
+    --min-cols: #{$min-cols};
+    --max-cols: #{$max-cols};
+    --cols-min-width: #{$cols-min-width};
+    --grid-row-gap: #{$grid-row-gap};
+    --grid-column-gap: #{$grid-column-gap};
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min((100%/var(--min-cols) - var(--grid-column-gap)*(var(--min-cols) - 1)/var(--min-cols)), max(var(--cols-min-width), (100%/var(--max-cols) - var(--grid-column-gap)*(var(--max-cols) - 1)/var(--max-cols)))), 1fr));
+    gap: $grid-row-gap $grid-column-gap;
+  }
