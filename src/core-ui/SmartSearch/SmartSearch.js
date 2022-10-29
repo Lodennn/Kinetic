@@ -4,6 +4,7 @@ import { useState } from "react";
 import classes from "./SmartSearch.module.scss";
 
 const SmartSearch = (props) => {
+  console.log('props: ', props);
   const [isFocused, setIsFocused] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
 
@@ -16,13 +17,19 @@ const SmartSearch = (props) => {
 
   const transformedData = (data) => {
     let workoutsCategorized = {};
-
+    
     for (let i = 0; i < data.length; i++) {
+      let superSetWorkout = '';
       let item = props.data[i];
       let targetKey = item.category;
+
       if (!(targetKey in workoutsCategorized))
         workoutsCategorized[targetKey] = [];
+      if(!!item.superSet.workoutName) {
+        superSetWorkout = item.superSet.workoutName;
+      }
       workoutsCategorized[targetKey].push(item.workoutName);
+      !!superSetWorkout && workoutsCategorized[targetKey].push(superSetWorkout);
     }
 
     return {
@@ -32,6 +39,9 @@ const SmartSearch = (props) => {
   };
 
   const { categorizedData, categories } = transformedData(props.data);
+
+  console.log('categorizedData: ', categorizedData);
+  console.log('categories: ', categories);
 
   const { name, value } = props.input;
   const { setFieldValue } = props;
