@@ -13,9 +13,7 @@ export const getProgramsAction = createAsyncThunk(
     try {
       const data = await getCollection("programs");
       return data;
-    } catch (error) {
-      console.log("error: ", error);
-    }
+    } catch (error) {}
   }
 );
 

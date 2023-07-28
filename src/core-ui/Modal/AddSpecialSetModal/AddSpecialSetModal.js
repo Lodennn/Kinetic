@@ -39,7 +39,6 @@ const AddSpecialSetModal = (props) => {
           props.addSetsHandler();
         });
       } else {
-        console.log("NOT VALID");
       }
     },
     validationSchema,

@@ -52,7 +52,6 @@ const ViewNote = (props) => {
     },
     validationSchema,
     onSubmit(values) {
-      console.log("values: ", values);
       dispatch(
         updateNoteAction({
           note: values.note,
@@ -62,8 +61,6 @@ const ViewNote = (props) => {
       );
     },
   });
-
-  console.log("errors: ", errors);
 
   return (
     <div

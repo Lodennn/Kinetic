@@ -8,8 +8,6 @@ const WorkoutBadge = (props) => {
   let RenderedBadge = null;
   let isRenderAllowed = true;
 
-  console.log("props.type: ", props.type);
-
   switch (props.type) {
     case "up":
       RenderedBadge = UpBadge;

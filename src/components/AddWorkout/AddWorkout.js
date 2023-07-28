@@ -158,7 +158,6 @@ const AddWorkout = (props) => {
           })
         ).then((_) => props.onHide());
       } else {
-        console.log("NOT SUBMITTED");
       }
     },
     validationSchema: workoutValidationSchema(

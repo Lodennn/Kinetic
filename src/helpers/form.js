@@ -46,8 +46,6 @@ export const onSubmitCrudWorkoutForm = (
 
   const submittedData = {};
 
-  console.log("props: ", props);
-
   const trimmedWorkoutname = formData.values.workoutName.trim();
 
   submittedData.userId = user.id;
@@ -104,8 +102,6 @@ export const onSubmitCrudWorkoutForm = (
   );
 
   submittedData.progressState = progressStatus;
-
-  console.log("formData.submittedData: ", submittedData);
 
   return { submittedData, isValid };
 };

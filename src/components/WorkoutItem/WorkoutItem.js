@@ -89,8 +89,6 @@ const WorkoutItem = (props) => {
       progressStateType = "down";
     }
 
-    console.log("progressStateType: ", progressStateType);
-
     return (
       <li className={classes["workout-item__header-badge"]}>
         <WorkoutBadge type={progressStateType} />
@@ -99,8 +97,10 @@ const WorkoutItem = (props) => {
   };
 
   const deleteWorkoutHandler = () => {
-    const isDelete = window.confirm(`Are you sure, you want to delete *${displayWorkoutName()}* workout?`);
-    if(isDelete) {
+    const isDelete = window.confirm(
+      `Are you sure, you want to delete *${displayWorkoutName()}* workout?`
+    );
+    if (isDelete) {
       dispatch(deleteWorkoutAction({ documentId: props.id }));
     }
   };

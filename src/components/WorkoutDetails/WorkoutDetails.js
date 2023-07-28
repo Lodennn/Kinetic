@@ -208,7 +208,6 @@ const WorkoutDetails = (props) => {
           onHide()
         );
       } else {
-        console.log("NOT SUBMITTED");
       }
     },
     validationSchema: Yup.object().shape({

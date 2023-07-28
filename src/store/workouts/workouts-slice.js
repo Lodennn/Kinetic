@@ -58,6 +58,7 @@ export const getWorkoutsAction = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const { programId, dayId, userId } = payload;
+
       const workouts = await getWorkouts(programId, dayId, userId);
 
       return workouts.map((workout) => ({

@@ -51,7 +51,6 @@ export const deleteNoteAction = createAsyncThunk(
   "notes/deleteNote",
   async (payload, { getState, dispatch }) => {
     try {
-      console.log("payload deleteNoteAction: ", payload);
       await deleteDocument({
         collectionName: "notes",
         documentId: payload.noteId,

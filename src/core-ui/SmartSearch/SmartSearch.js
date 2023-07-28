@@ -4,7 +4,6 @@ import { useState } from "react";
 import classes from "./SmartSearch.module.scss";
 
 const SmartSearch = (props) => {
-  console.log('props: ', props);
   const [isFocused, setIsFocused] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
 
@@ -16,16 +15,17 @@ const SmartSearch = (props) => {
   const smartSearchInputRef = useRef(null);
 
   const transformedData = (data) => {
+    if (!data) return {};
     let workoutsCategorized = {};
-    
+
     for (let i = 0; i < data.length; i++) {
-      let superSetWorkout = '';
+      let superSetWorkout = "";
       let item = props.data[i];
       let targetKey = item.category;
 
       if (!(targetKey in workoutsCategorized))
         workoutsCategorized[targetKey] = [];
-      if(!!item.superSet.workoutName) {
+      if (!!item.superSet.workoutName) {
         superSetWorkout = item.superSet.workoutName;
       }
       workoutsCategorized[targetKey].push(item.workoutName);
@@ -39,9 +39,6 @@ const SmartSearch = (props) => {
   };
 
   const { categorizedData, categories } = transformedData(props.data);
-
-  console.log('categorizedData: ', categorizedData);
-  console.log('categories: ', categories);
 
   const { name, value } = props.input;
   const { setFieldValue } = props;
@@ -72,7 +69,7 @@ const SmartSearch = (props) => {
         }}
         autoComplete="off"
       />
-      {categories.length > 0 && (
+      {categories?.length > 0 && (
         <div
           className={classes["smart-search__result"]}
           style={{ display: isFocused ? "block" : "none" }}

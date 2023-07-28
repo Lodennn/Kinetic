@@ -1,12 +1,14 @@
 import { resetDate } from "./dates";
 
 export const filterWorkotusByDate = (workouts, date) => {
+  if (!workouts) return [];
   return workouts.filter(
     (workout) => resetDate(workout.createdAt) === resetDate(date)
   );
 };
 
 export const getAvailableDatesInDay = (workouts, programId, dayId) => {
+  if (!workouts) return [];
   const availableDates = workouts
     .filter(
       (workout) => workout.programId === programId && workout.dayId === dayId
@@ -75,6 +77,7 @@ export const checkWorkoutProgressStatus = (oldWorkout, newWorkout) => {
 };
 
 export const getWorkoutByDate = (workouts, filterByThisDate) => {
+  if (!workouts) return [];
   return workouts.filter(
     (workout) =>
       resetDate(new Date(workout.createdAt)) ===
